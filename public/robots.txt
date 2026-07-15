@@ -1,0 +1,13 @@
+User-agent: *
+# Halaman publik boleh diindeks
+Allow: /
+
+# Panel admin TIDAK boleh diindeks oleh mesin pencari
+Disallow: /pentadbir
+Disallow: /pentadbir/
+
+# Endpoint sistem Laravel — tidak perlu diindeks
+Disallow: /up
+Disallow: /livewire/
+
+Sitemap: https://lam-bengkalis.go.id/sitemap.xml

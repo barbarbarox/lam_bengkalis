@@ -1,0 +1,136 @@
+@extends('layouts.app')
+
+@section('title', 'Berita — ' . ($setting->nama_lembaga ?? 'LAM Bengkalis'))
+
+@section('content')
+
+{{-- Page Header --}}
+<div style="background:var(--lam-green);padding:4rem 0 3rem;text-align:center;">
+  <div class="container">
+    <p style="font-size:.75rem;letter-spacing:.25em;text-transform:uppercase;color:var(--lam-gold);font-weight:600;margin-bottom:.75rem;">Informasi Terkini</p>
+    <h1 style="font-family:var(--font-head);font-size:clamp(1.75rem,4vw,2.75rem);color:white;">Berita &amp; Pengumuman</h1>
+  </div>
+</div>
+
+{{-- Filter + Search --}}
+<div style="background:white;border-bottom:1px solid var(--lam-border);padding:1rem 0;">
+  <div class="container" style="display:flex;flex-wrap:wrap;align-items:center;gap:1rem;">
+
+    {{-- Search --}}
+    <form method="GET" action="{{ route('berita.index') }}" style="flex:1;min-width:200px;display:flex;gap:.5rem;" role="search">
+      @if(request('kategori'))
+        <input type="hidden" name="kategori" value="{{ request('kategori') }}">
+      @endif
+      <div style="position:relative;flex:1;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="var(--lam-text-l)" stroke-width="2" viewBox="0 0 24 24"
+             style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="search" name="q" value="{{ request('q') }}" placeholder="Cari berita..."
+               style="width:100%;padding:.6rem .75rem .6rem 2.25rem;border:1px solid var(--lam-border);border-radius:var(--radius-sm);
+                      font-family:var(--font-body);font-size:.875rem;outline:none;"
+               aria-label="Cari berita">
+      </div>
+      <button type="submit" class="btn btn-primary" style="padding:.6rem 1.25rem;">Cari</button>
+    </form>
+
+    {{-- Kategori filter pills --}}
+    <div style="display:flex;flex-wrap:wrap;gap:.5rem;" role="group" aria-label="Filter kategori">
+      <a href="{{ route('berita.index', request()->except('kategori')) }}"
+         class="btn {{ !request('kategori') ? 'btn-primary' : 'btn-outline' }}"
+         style="padding:.4rem .875rem;font-size:.8rem;">
+        Semua
+      </a>
+      @foreach($kategori as $kat)
+        <a href="{{ route('berita.index', array_merge(request()->except('kategori','page'), ['kategori' => $kat->slug])) }}"
+           class="btn {{ request('kategori') === $kat->slug ? 'btn-primary' : 'btn-outline' }}"
+           style="padding:.4rem .875rem;font-size:.8rem;">
+          {{ $kat->nama }}
+        </a>
+      @endforeach
+    </div>
+  </div>
+</div>
+
+{{-- Berita Grid --}}
+<section class="section-pad" style="background:var(--lam-cream);">
+  <div class="container">
+
+    @if($berita->count() > 0)
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;margin-bottom:3rem;">
+        @foreach($berita as $b)
+          <article class="card-berita" style="cursor:pointer;" onclick="window.location.href='{{ route('berita.show', $b->slug) }}'">
+            @if($b->thumbnail)
+              <img src="{{ Storage::url($b->thumbnail) }}" alt="{{ $b->judul }}"
+                   class="card-berita__img" loading="lazy">
+            @else
+              <div class="card-berita__img-placeholder" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" stroke="var(--lam-green)" stroke-width="1" viewBox="0 0 24 24">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                </svg>
+              </div>
+            @endif
+            <div class="card-berita__body">
+              <p class="card-berita__cat">{{ $b->kategori?->nama ?? 'Umum' }}</p>
+              <h2 class="card-berita__title" style="font-size:.975rem;">
+                <a href="{{ route('berita.show', $b->slug) }}" style="color:inherit;">{{ $b->judul }}</a>
+              </h2>
+              <p class="card-berita__excerpt">{{ $b->excerpt }}</p>
+              <div class="card-berita__meta">
+                <time datetime="{{ $b->tanggal_publish?->toISOString() }}">
+                  {{ $b->tanggal_publish?->translatedFormat('d M Y') ?? '—' }}
+                </time>
+                <a href="{{ route('berita.show', $b->slug) }}"
+                   style="color:var(--lam-green);font-weight:600;font-size:.8rem;display:flex;align-items:center;gap:.25rem;">
+                  Baca
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              </div>
+            </div>
+          </article>
+        @endforeach
+      </div>
+
+      {{-- Pagination --}}
+      @if($berita->hasPages())
+        <div style="display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;">
+          {{-- Prev --}}
+          @if($berita->onFirstPage())
+            <span style="padding:.5rem .875rem;border-radius:var(--radius-sm);background:white;color:var(--lam-text-l);border:1px solid var(--lam-border);">Sebelumnya</span>
+          @else
+            <a href="{{ $berita->previousPageUrl() }}" class="btn btn-outline" style="padding:.5rem .875rem;">Sebelumnya</a>
+          @endif
+
+          {{-- Pages --}}
+          @foreach($berita->getUrlRange(max(1,$berita->currentPage()-2), min($berita->lastPage(),$berita->currentPage()+2)) as $page => $url)
+            @if($page == $berita->currentPage())
+              <span style="padding:.5rem .875rem;border-radius:var(--radius-sm);background:var(--lam-green);color:white;font-weight:600;min-width:40px;text-align:center;">{{ $page }}</span>
+            @else
+              <a href="{{ $url }}" style="padding:.5rem .875rem;border-radius:var(--radius-sm);border:1px solid var(--lam-border);background:white;color:var(--lam-text);min-width:40px;text-align:center;">{{ $page }}</a>
+            @endif
+          @endforeach
+
+          {{-- Next --}}
+          @if($berita->hasMorePages())
+            <a href="{{ $berita->nextPageUrl() }}" class="btn btn-outline" style="padding:.5rem .875rem;">Berikutnya</a>
+          @else
+            <span style="padding:.5rem .875rem;border-radius:var(--radius-sm);background:white;color:var(--lam-text-l);border:1px solid var(--lam-border);">Berikutnya</span>
+          @endif
+        </div>
+      @endif
+
+    @else
+      <div style="text-align:center;padding:5rem 0;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" fill="none" stroke="var(--lam-text-l)" stroke-width="1" viewBox="0 0 24 24" aria-hidden="true" style="margin:0 auto 1.5rem;"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+        <h2 style="color:var(--lam-text-l);font-size:1.1rem;font-weight:500;">Belum ada berita yang diterbitkan.</h2>
+        @if(request('q') || request('kategori'))
+          <p style="color:var(--lam-text-l);margin-top:.5rem;font-size:.9rem;">Coba ubah kata kunci atau pilih kategori yang berbeda.</p>
+          <a href="{{ route('berita.index') }}" class="btn btn-outline" style="margin-top:1.5rem;">Lihat Semua Berita</a>
+        @endif
+      </div>
+    @endif
+
+  </div>
+</section>
+
+@endsection
