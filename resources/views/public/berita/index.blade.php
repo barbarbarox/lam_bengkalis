@@ -13,7 +13,7 @@
 </div>
 
 {{-- Filter + Search --}}
-<div style="background:white;border-bottom:1px solid var(--lam-border);padding:1rem 0;">
+<div style="background:var(--lam-bg-alt);border-bottom:1px solid var(--lam-border);padding:1rem 0;">
   <div class="container" style="display:flex;flex-wrap:wrap;align-items:center;gap:1rem;">
 
     {{-- Search --}}
@@ -96,7 +96,7 @@
         <div style="display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;">
           {{-- Prev --}}
           @if($berita->onFirstPage())
-            <span style="padding:.5rem .875rem;border-radius:var(--radius-sm);background:white;color:var(--lam-text-l);border:1px solid var(--lam-border);">Sebelumnya</span>
+            <span style="padding:.5rem .875rem;border-radius:var(--radius-sm);background:var(--lam-bg-alt);color:var(--lam-text-l);border:1px solid var(--lam-border);">Sebelumnya</span>
           @else
             <a href="{{ $berita->previousPageUrl() }}" class="btn btn-outline" style="padding:.5rem .875rem;">Sebelumnya</a>
           @endif
@@ -106,7 +106,7 @@
             @if($page == $berita->currentPage())
               <span style="padding:.5rem .875rem;border-radius:var(--radius-sm);background:var(--lam-green);color:white;font-weight:600;min-width:40px;text-align:center;">{{ $page }}</span>
             @else
-              <a href="{{ $url }}" style="padding:.5rem .875rem;border-radius:var(--radius-sm);border:1px solid var(--lam-border);background:white;color:var(--lam-text);min-width:40px;text-align:center;">{{ $page }}</a>
+              <a href="{{ $url }}" style="padding:.5rem .875rem;border-radius:var(--radius-sm);border:1px solid var(--lam-border);background:var(--lam-bg-alt);color:var(--lam-text);min-width:40px;text-align:center;">{{ $page }}</a>
             @endif
           @endforeach
 
@@ -114,7 +114,7 @@
           @if($berita->hasMorePages())
             <a href="{{ $berita->nextPageUrl() }}" class="btn btn-outline" style="padding:.5rem .875rem;">Berikutnya</a>
           @else
-            <span style="padding:.5rem .875rem;border-radius:var(--radius-sm);background:white;color:var(--lam-text-l);border:1px solid var(--lam-border);">Berikutnya</span>
+            <span style="padding:.5rem .875rem;border-radius:var(--radius-sm);background:var(--lam-bg-alt);color:var(--lam-text-l);border:1px solid var(--lam-border);">Berikutnya</span>
           @endif
         </div>
       @endif

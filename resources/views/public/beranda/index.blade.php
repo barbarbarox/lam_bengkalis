@@ -33,18 +33,20 @@
 
   {{-- Konten tengah hero --}}
   <div class="container" style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding-top:4rem;">
-    <p style="font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:var(--lam-gold);font-weight:600;margin-bottom:1rem;">
-      Lembaga Resmi Pemerintah Daerah
-    </p>
-    <h1 style="font-family:var(--font-head);font-size:clamp(2rem,5vw,3.5rem);color:white;font-weight:700;max-width:700px;line-height:1.2;margin-bottom:1.25rem;text-shadow:0 2px 12px rgba(0,0,0,.5);">
-      {{ $setting->nama_lembaga ?? 'Lembaga Adat Melayu Kabupaten Bengkalis' }}
-    </h1>
-    <p style="color:rgba(255,255,255,.85);max-width:540px;font-size:1.05rem;margin-bottom:2rem;">
-      {{ $setting->meta_deskripsi ?? 'Menjaga, melestarikan, dan mengembangkan adat budaya Melayu di Kabupaten Bengkalis.' }}
-    </p>
-    <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
-      <a href="{{ route('profil') }}" class="btn btn-primary">Profil Lembaga</a>
-      <a href="{{ route('berita.index') }}" class="btn btn-outline-white">Baca Berita</a>
+    <div style="background:rgba(212, 160, 23, 0.85); backdrop-filter: blur(4px); padding: 3rem; border-radius: var(--radius); box-shadow: var(--lam-shadow); max-width: 800px;">
+      <p style="font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:var(--lam-black-d);font-weight:700;margin-bottom:1rem;">
+        Lembaga Resmi Pemerintah Daerah
+      </p>
+      <h1 style="font-family:var(--font-head);font-size:clamp(2rem,5vw,3.5rem);color:var(--lam-black);font-weight:700;max-width:700px;line-height:1.2;margin-bottom:1.25rem;text-shadow:none;">
+        {{ $setting->nama_lembaga ?? 'Lembaga Adat Melayu Kabupaten Bengkalis' }}
+      </h1>
+      <p style="color:var(--lam-black-l);max-width:540px;font-size:1.05rem;margin-bottom:2rem;margin-left:auto;margin-right:auto;font-weight:500;">
+        {{ $setting->meta_deskripsi ?? 'Menjaga, melestarikan, dan mengembangkan adat budaya Melayu di Kabupaten Bengkalis.' }}
+      </p>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+        <a href="{{ route('profil') }}" class="btn" style="background:var(--lam-black);color:var(--lam-gold);">Profil Lembaga</a>
+        <a href="{{ route('berita.index') }}" class="btn" style="background:transparent;border:2px solid var(--lam-black);color:var(--lam-black);">Baca Berita</a>
+      </div>
     </div>
   </div>
 
@@ -81,7 +83,7 @@
      SAMBUTAN BPH
 ════════════════════════════════════════════════════════════════ --}}
 @if($sambutan)
-<section id="sambutan" class="section-pad" style="background:white;">
+<section id="sambutan" class="section-pad" style="background:var(--lam-bg-alt);">
   <div class="container">
     <div style="display:grid;grid-template-columns:1fr 2fr;gap:3rem;align-items:center;" class="sambutan-grid">
       {{-- Foto --}}

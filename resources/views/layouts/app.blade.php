@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#0B4F30">
+  <meta name="theme-color" content="#121212">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   {{-- SEO --}}
@@ -22,27 +22,65 @@
   {{-- reCAPTCHA v3 (hanya di halaman kontak) --}}
   @stack('head_scripts')
 
+  {{-- FOUC Prevention --}}
+  <script>
+    (function() {
+      const theme = localStorage.getItem('lam_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
   <style>
     /* ─── Design Tokens ────────────────────────────────────────── */
     :root {
-      --lam-green:   #0B4F30;
-      --lam-green-d: #083d24;
-      --lam-green-l: #1a7a4e;
-      --lam-gold:    #D4AF37;
-      --lam-gold-d:  #b8941f;
-      --lam-maroon:  #7A1E1E;
-      --lam-cream:   #F5EEDD;
-      --lam-cream-d: #e8d9bc;
-      --lam-text:    #1C1C1C;
-      --lam-text-m:  #4a4a4a;
-      --lam-text-l:  #6b7280;
-      --lam-border:  rgba(11,79,48,.15);
-      --lam-shadow:  0 4px 24px rgba(11,79,48,.1);
+      /* Light Mode Palette */
+      --lam-bg:      #fafaf9;
+      --lam-bg-alt:  #ffffff;
+      --lam-text:    #3E2716;
+      --lam-text-m:  #5C3A21;
+      --lam-text-l:  #7B4F2D;
+      
+      --lam-black:   #121212;
+      --lam-black-d: #080808;
+      --lam-black-l: #1f1f1f;
+      --lam-gold:    #D4A017;
+      --lam-gold-d:  #b8860b;
+      --lam-brown:   #5C3A21;
+      --lam-brown-d: #3E2716;
+      --lam-brown-l: #7B4F2D;
+      
+      --lam-border:  rgba(92,58,33,.2);
+      --lam-shadow:  0 4px 24px rgba(0,0,0,.08);
+      
+      /* Maintain compatibility if used in sub-views */
+      --lam-green:   var(--lam-black);
+      --lam-green-d: var(--lam-black-d);
+      --lam-green-l: var(--lam-black-l);
+      --lam-maroon:  var(--lam-brown);
+      --lam-cream:   var(--lam-bg);
+      --lam-cream-d: var(--lam-bg-alt);
+      
       --font-head:   'Playfair Display', Georgia, serif;
       --font-body:   'Inter', system-ui, sans-serif;
       --radius:      .75rem;
       --radius-sm:   .375rem;
       --transition:  .25s ease;
+      
+      --lam-nav-bg:  rgba(62, 39, 22, 0.98); /* Brown for light mode */
+    }
+
+    [data-theme="dark"] {
+      /* Dark Mode Palette */
+      --lam-bg:      #18181b;
+      --lam-bg-alt:  #27272a;
+      --lam-text:    #F5F5F5;
+      --lam-text-m:  #e5e7eb;
+      --lam-text-l:  #A3A3A3;
+      
+      --lam-border:  rgba(212,160,23,.2);
+      --lam-shadow:  0 0 0 1px var(--lam-brown); /* Replaces shadow with subtle brown border */
+      
+      --lam-nav-bg:  rgba(18, 18, 18, 0.98); /* Black for dark mode */
     }
 
     /* ─── Reset & Base ─────────────────────────────────────────── */
@@ -51,7 +89,7 @@
     body {
       font-family: var(--font-body);
       color: var(--lam-text);
-      background: var(--lam-cream);
+      background: var(--lam-bg);
       line-height: 1.7;
       overflow-x: hidden;
     }
@@ -73,7 +111,7 @@
       margin-bottom: .75rem; font-weight: 600;
     }
     .section-heading__title {
-      font-size: clamp(1.75rem, 3.5vw, 2.5rem); color: var(--lam-green);
+      font-size: clamp(1.75rem, 3.5vw, 2.5rem); color: var(--lam-gold);
     }
     .section-heading__divider {
       display: flex; align-items: center; justify-content: center;
@@ -98,15 +136,15 @@
     }
     .btn:hover { transform: translateY(-1px); }
     .btn-primary {
-      background: var(--lam-gold); color: var(--lam-green);
+      background: var(--lam-gold); color: var(--lam-black);
       border-color: var(--lam-gold);
     }
-    .btn-primary:hover { background: var(--lam-gold-d); border-color: var(--lam-gold-d); }
+    .btn-primary:hover { background: var(--lam-gold-d); border-color: var(--lam-gold-d); color: var(--lam-black); }
     .btn-outline {
-      background: transparent; color: var(--lam-green);
-      border-color: var(--lam-green);
+      background: transparent; color: var(--lam-gold);
+      border-color: var(--lam-gold);
     }
-    .btn-outline:hover { background: var(--lam-green); color: white; }
+    .btn-outline:hover { background: var(--lam-gold); color: var(--lam-black); }
     .btn-outline-white {
       background: transparent; color: white; border-color: rgba(255,255,255,.6);
     }
@@ -115,11 +153,11 @@
     /* ─── Navbar ───────────────────────────────────────────────── */
     .navbar {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(11,79,48,.95);
+      background: var(--lam-nav-bg);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 4px 20px rgba(0,0,0,.15);
-      border-bottom: 1px solid rgba(255,255,255,.05);
+      box-shadow: 0 4px 20px rgba(0,0,0,.5);
+      border-bottom: 1px solid var(--lam-border);
       transition: all var(--transition);
     }
     .navbar__inner {
@@ -132,7 +170,7 @@
     .navbar__brand-logo {
       width: 48px; height: 48px; border-radius: 50%;
       object-fit: contain; background: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,.15);
+      box-shadow: 0 2px 10px rgba(212,160,23,.2); /* gold shadow */
     }
     .navbar__brand-text {
       display: flex; flex-direction: column;
@@ -143,7 +181,7 @@
       letter-spacing: .02em;
     }
     .navbar__brand-sub {
-      font-size: .7rem; color: rgba(255,255,255,.8);
+      font-size: .7rem; color: rgba(255,255,255,.7);
       letter-spacing: .15em; text-transform: uppercase;
       margin-top: .1rem;
     }
@@ -154,7 +192,7 @@
     .navbar__link {
       position: relative;
       padding: .5rem 0; 
-      color: rgba(255,255,255,.9); font-size: .9rem; font-weight: 500;
+      color: rgba(255,255,255,.85); font-size: .9rem; font-weight: 500;
       transition: color var(--transition);
     }
     .navbar__link::after {
@@ -175,16 +213,16 @@
       display: inline-flex; align-items: center; gap: .5rem;
       margin-left: .5rem; padding: .6rem 1.25rem;
       background: linear-gradient(135deg, var(--lam-gold), var(--lam-gold-d));
-      color: var(--lam-green-d);
+      color: var(--lam-black);
       border-radius: 50px;
       font-size: .85rem; font-weight: 700;
       letter-spacing: .03em;
-      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+      box-shadow: 0 4px 15px rgba(212, 160, 23, 0.25);
       transition: all var(--transition);
     }
     .navbar__museum-btn:hover { 
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+      box-shadow: 0 6px 20px rgba(212, 160, 23, 0.4);
     }
 
     .navbar__hamburger {
@@ -193,36 +231,36 @@
     }
     .navbar__hamburger span {
       display: block; width: 24px; height: 2px;
-      background: white; border-radius: 2px;
+      background: var(--lam-gold); border-radius: 2px;
       transition: transform .25s, opacity .25s;
     }
 
     /* Mobile nav */
     .navbar__mobile {
       display: none; flex-direction: column;
-      background: rgba(8,61,36,.98);
+      background: var(--lam-nav-bg);
       backdrop-filter: blur(10px);
       padding: 1rem 0;
-      border-top: 1px solid rgba(255,255,255,.05);
+      border-top: 1px solid var(--lam-border);
     }
     .navbar__mobile-link {
-      padding: .85rem 1.5rem; color: rgba(255,255,255,.9);
+      padding: .85rem 1.5rem; color: rgba(255,255,255,.85);
       font-size: .95rem; font-weight: 500;
       transition: color var(--transition), background var(--transition);
       border-left: 3px solid transparent;
     }
     .navbar__mobile-link:hover { 
       color: var(--lam-gold); 
-      background: rgba(255,255,255,.05); 
+      background: rgba(255,255,255,.02); 
       border-left-color: var(--lam-gold);
     }
     .navbar__mobile-museum-btn {
       margin: 1rem 1.5rem .5rem;
       padding: .75rem; text-align: center;
-      background: var(--lam-gold); color: var(--lam-green-d);
+      background: var(--lam-gold); color: var(--lam-black);
       border-radius: var(--radius-sm); font-weight: 700;
       display: flex; align-items: center; justify-content: center; gap: .5rem;
-      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+      box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
     }
 
     @media (max-width: 768px) {
@@ -231,9 +269,82 @@
       .navbar__mobile.is-open { display: flex; }
     }
 
+    @media (max-width: 600px) {
+      .container { padding: 0 1rem; }
+    }
+
+    /* Uiverse Social Buttons for Footer */
+    .social {
+      margin: 0;
+      list-style: none;
+      padding-left: 0;
+      display: flex;
+      align-items: center;
+    }
+    .social .social-item {
+      margin-right: 25px; /* Adjust spacing to fit footer */
+      width: 35px;
+      height: 35px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .social .social-item .social-link {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      text-align: center;
+      transform: perspective(1000px) rotate(-30deg) skew(25deg) translate(0, 0);
+      transition: all 0.4s ease;
+      color: var(--hover-color);
+    }
+    .social .social-item .social-link::before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: -10px;
+      height: 100%;
+      width: 10px;
+      background: #b1b1b1;
+      transition: all 0.4s ease;
+      transform: rotate(0deg) skewY(-45deg);
+    }
+    .social .social-item .social-link::after {
+      content: "";
+      position: absolute;
+      top: 35px;
+      left: -5px;
+      height: 10px;
+      width: 100%;
+      background: #b1b1b1;
+      transition: all 0.4s ease;
+      transform: rotate(0deg) skewX(-45deg);
+    }
+    .social .social-item .social-link:hover {
+      transform: perspective(1000px) rotate(-30deg) skew(25deg) translate(5px, -5px);
+      box-shadow: -20px 20px 10px rgba(0, 0, 0, 0.5);
+      background: var(--hover-color);
+      color: #ffffff;
+    }
+    .social .social-item .social-link:hover::before {
+      background: var(--hover-color);
+    }
+    .social .social-item .social-link:hover::after {
+      background: var(--hover-color);
+    }
+    .social .social-item .social-link svg {
+      width: 18px;
+      height: 18px;
+    }
+
     /* ─── Footer ───────────────────────────────────────────────── */
     .footer {
-      background: var(--lam-green-d); color: rgba(255,255,255,.75);
+      background: var(--lam-brown-d); color: var(--lam-text-m);
+      border-top: 4px solid var(--lam-gold);
       padding: 3.5rem 0 1.5rem;
     }
     .footer__grid {
@@ -244,7 +355,7 @@
       font-family: var(--font-head); font-size: 1.1rem;
       color: var(--lam-gold); margin-bottom: .5rem;
     }
-    .footer__brand-desc { font-size: .85rem; line-height: 1.7; }
+    .footer__brand-desc { font-size: .85rem; line-height: 1.7; color: rgba(255,255,255,.8); }
     .footer__col-title {
       font-family: var(--font-body); font-size: .75rem; font-weight: 600;
       letter-spacing: .15em; text-transform: uppercase;
@@ -252,7 +363,7 @@
     }
     .footer__links { display: flex; flex-direction: column; gap: .5rem; }
     .footer__links a {
-      font-size: .875rem; color: rgba(255,255,255,.7);
+      font-size: .875rem; color: rgba(255,255,255,.8);
       transition: color var(--transition);
     }
     .footer__links a:hover { color: var(--lam-gold); }
@@ -260,7 +371,7 @@
       border-top: 1px solid rgba(255,255,255,.1);
       padding-top: 1.5rem; font-size: .8rem;
       display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: .5rem;
+      flex-wrap: wrap; gap: .5rem; color: rgba(255,255,255,.6);
     }
     @media (max-width: 768px) {
       .footer__grid { grid-template-columns: 1fr; }
@@ -269,15 +380,20 @@
 
     /* ─── Card Berita ──────────────────────────────────────────── */
     .card-berita {
-      background: white; border-radius: var(--radius);
+      background: var(--lam-black-l); border-radius: var(--radius);
+      border: 1px solid var(--lam-border);
       overflow: hidden; box-shadow: var(--lam-shadow);
-      transition: transform var(--transition), box-shadow var(--transition);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
       display: flex; flex-direction: column;
     }
-    .card-berita:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(11,79,48,.15); }
+    .card-berita:hover { 
+      transform: translateY(-4px); 
+      box-shadow: 0 12px 40px rgba(0,0,0,.8); 
+      border-color: var(--lam-gold); 
+    }
     .card-berita__img { width: 100%; height: 200px; object-fit: cover; }
     .card-berita__img-placeholder {
-      width: 100%; height: 200px; background: var(--lam-cream-d);
+      width: 100%; height: 200px; background: var(--lam-black-d);
       display: flex; align-items: center; justify-content: center;
     }
     .card-berita__body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
@@ -286,22 +402,115 @@
       text-transform: uppercase; color: var(--lam-gold); margin-bottom: .5rem;
     }
     .card-berita__title {
-      font-size: 1rem; color: var(--lam-text); margin-bottom: .75rem;
+      font-size: 1rem; color: #F5F5F5; margin-bottom: .75rem;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      transition: color var(--transition);
     }
+    .card-berita:hover .card-berita__title { color: var(--lam-gold); }
     .card-berita__excerpt {
-      font-size: .85rem; color: var(--lam-text-l); flex: 1;
+      font-size: .85rem; color: rgba(255,255,255,.8); flex: 1;
       display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
     }
     .card-berita__meta {
       margin-top: 1rem; padding-top: .75rem;
-      border-top: 1px solid var(--lam-border);
-      font-size: .78rem; color: var(--lam-text-l);
+      border-top: 1px solid rgba(255,255,255,.1);
+      font-size: .78rem; color: rgba(255,255,255,.6);
       display: flex; justify-content: space-between; align-items: center;
+    }
+
+    /* ─── Theme Switch ────────────────────────────────────────────── */
+    .theme-switch {
+      --toggle-size: 14px;
+      --container-width: 5.625em;
+      --container-height: 2.5em;
+      --container-radius: 6.25em;
+      --container-light-bg: #3D7EAE;
+      --container-night-bg: #1D1F2C;
+      --circle-container-diameter: 3.375em;
+      --sun-moon-diameter: 2.125em;
+      --sun-bg: #ECCA2F;
+      --moon-bg: #C4C9D1;
+      --spot-color: #959DB1;
+      --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+      --stars-color: #fff;
+      --clouds-color: #F3FDFF;
+      --back-clouds-color: #AACADF;
+      --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+      --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+    }
+    .theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+      -webkit-box-sizing: border-box; box-sizing: border-box; margin: 0; padding: 0; font-size: var(--toggle-size);
+    }
+    .theme-switch__container {
+      width: var(--container-width); height: var(--container-height);
+      background-color: var(--container-light-bg); border-radius: var(--container-radius);
+      overflow: hidden; cursor: pointer; position: relative;
+      -webkit-box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+      box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+      transition: var(--transition);
+    }
+    .theme-switch__container::before {
+      content: ""; position: absolute; z-index: 1; inset: 0;
+      box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+      border-radius: var(--container-radius)
+    }
+    .theme-switch__checkbox { display: none; }
+    .theme-switch__circle-container {
+      width: var(--circle-container-diameter); height: var(--circle-container-diameter);
+      background-color: rgba(255, 255, 255, 0.1); position: absolute;
+      left: var(--circle-container-offset); top: var(--circle-container-offset);
+      border-radius: var(--container-radius);
+      box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+      display: flex; transition: var(--circle-transition); pointer-events: none;
+    }
+    .theme-switch__sun-moon-container {
+      pointer-events: auto; position: relative; z-index: 2;
+      width: var(--sun-moon-diameter); height: var(--sun-moon-diameter);
+      margin: auto; border-radius: var(--container-radius); background-color: var(--sun-bg);
+      box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+      filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+      overflow: hidden; transition: var(--transition);
+    }
+    .theme-switch__moon {
+      transform: translateX(100%); width: 100%; height: 100%;
+      background-color: var(--moon-bg); border-radius: inherit;
+      box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+      transition: var(--transition); position: relative;
+    }
+    .theme-switch__spot {
+      position: absolute; top: 0.75em; left: 0.312em; width: 0.75em; height: 0.75em;
+      border-radius: var(--container-radius); background-color: var(--spot-color);
+      box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+    }
+    .theme-switch__spot:nth-of-type(2) { width: 0.375em; height: 0.375em; top: 0.937em; left: 1.375em; }
+    .theme-switch__spot:nth-last-of-type(3) { width: 0.25em; height: 0.25em; top: 0.312em; left: 0.812em; }
+    .theme-switch__clouds {
+      width: 1.25em; height: 1.25em; background-color: var(--clouds-color);
+      border-radius: var(--container-radius); position: absolute; bottom: -0.625em; left: 0.312em;
+      box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+      transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+    }
+    .theme-switch__stars-container {
+      position: absolute; color: var(--stars-color); top: -100%; left: 0.312em;
+      width: 2.75em; height: auto; transition: var(--transition);
+    }
+    .theme-switch__checkbox:checked + .theme-switch__container { background-color: var(--container-night-bg); }
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+      left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+    }
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover {
+      left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em)
+    }
+    .theme-switch__circle-container:hover { left: calc(var(--circle-container-offset) + 0.187em); }
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon { transform: translate(0); }
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds { bottom: -4.062em; }
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+      top: 50%; transform: translateY(-50%);
     }
   </style>
 </head>
-<body>
+<body x-data="{ theme: localStorage.getItem('lam_theme') || 'light' }" 
+      @theme-toggled.window="theme = $event.detail; localStorage.setItem('lam_theme', theme); document.documentElement.setAttribute('data-theme', theme)">
 
 {{-- Loading Screen (hanya render sekali di sesi pertama) --}}
 <x-loading-screen />
@@ -343,6 +552,28 @@
           Museum
         </a>
       @endif
+
+      {{-- Theme Toggle (Desktop) --}}
+      <label class="theme-switch" style="display:inline-block; vertical-align:middle; margin-left: 1rem;" aria-label="Toggle Theme">
+        <input type="checkbox" class="theme-switch__checkbox" 
+               :checked="theme === 'dark'"
+               @change="$dispatch('theme-toggled', $event.target.checked ? 'dark' : 'light')">
+        <div class="theme-switch__container">
+          <div class="theme-switch__clouds"></div>
+          <div class="theme-switch__stars-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" fill="currentColor"></path></svg>
+          </div>
+          <div class="theme-switch__circle-container">
+            <div class="theme-switch__sun-moon-container">
+              <div class="theme-switch__moon">
+                <div class="theme-switch__spot"></div>
+                <div class="theme-switch__spot"></div>
+                <div class="theme-switch__spot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </label>
     </nav>
 
     {{-- Hamburger Mobile --}}
@@ -377,6 +608,31 @@
         Jejak Layar (Museum)
       </a>
     @endif
+    
+    {{-- Theme Toggle (Mobile) --}}
+    <div style="padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+      <span style="color: rgba(255,255,255,.85); font-size: .95rem; font-weight: 500;">Ubah Tema</span>
+      <label class="theme-switch" aria-label="Toggle Theme">
+        <input type="checkbox" class="theme-switch__checkbox" 
+               :checked="theme === 'dark'"
+               @change="$dispatch('theme-toggled', $event.target.checked ? 'dark' : 'light')">
+        <div class="theme-switch__container">
+          <div class="theme-switch__clouds"></div>
+          <div class="theme-switch__stars-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" fill="currentColor"></path></svg>
+          </div>
+          <div class="theme-switch__circle-container">
+            <div class="theme-switch__sun-moon-container">
+              <div class="theme-switch__moon">
+                <div class="theme-switch__spot"></div>
+                <div class="theme-switch__spot"></div>
+                <div class="theme-switch__spot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </label>
+    </div>
   </nav>
 </header>
 
@@ -410,20 +666,28 @@
           ];
         @endphp
         @if(!empty($sosmed))
-          <div style="display:flex;gap:.75rem;margin-top:1.25rem;">
+          <ul class="social" style="margin-top:1.5rem; justify-content:flex-start;">
+            @php
+              $socialColors = [
+                'facebook'  => '#3b5999',
+                'twitter'   => '#55acee',
+                'youtube'   => '#dd4b39',
+                'instagram' => '#e4405f',
+              ];
+            @endphp
             @foreach($sosmed as $s)
               @if(!empty($s['url']))
-                <a href="{{ $s['url'] }}" target="_blank" rel="noopener noreferrer"
-                   aria-label="{{ ucfirst($s['platform'] ?? '') }}"
-                   style="color:rgba(255,255,255,.5);transition:color .25s;"
-                   onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color='rgba(255,255,255,.5)'">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    {!! $icons[$s['platform']] ?? '<circle cx="12" cy="12" r="10"/>' !!}
-                  </svg>
-                </a>
+                @php $color = $socialColors[$s['platform'] ?? ''] ?? '#b1b1b1'; @endphp
+                <li class="social-item" style="--hover-color: {{ $color }};">
+                  <a class="social-link" href="{{ $s['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ ucfirst($s['platform'] ?? '') }}">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                      {!! $icons[$s['platform']] ?? '<circle cx="12" cy="12" r="10"/>' !!}
+                    </svg>
+                  </a>
+                </li>
               @endif
             @endforeach
-          </div>
+          </ul>
         @endif
       </div>
 
@@ -460,7 +724,7 @@
 
     <div class="footer__bottom">
       <span>&copy; {{ $setting->tahun_berdiri ?? date('Y') }}–{{ date('Y') }} {{ $setting->nama_lembaga ?? 'LAM Bengkalis' }}. Hak Cipta Dilindungi.</span>
-      <span style="font-size:.75rem;opacity:.5;">Sistem Informasi LAM Bengkalis</span>
+      <span style="font-size:.75rem;opacity:.6;">Sistem Informasi LAM Bengkalis &bull; Supported by <span style="color:var(--lam-gold);font-weight:600;">Tim JejakLayar</span></span>
     </div>
   </div>
 </footer>

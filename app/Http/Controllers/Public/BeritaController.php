@@ -57,6 +57,13 @@ class BeritaController extends Controller
             ->limit(3)
             ->get();
 
-        return view('public.berita.show', compact('setting', 'artikel', 'terkait'));
+        // Rekomendasi Artikel (Random, 3 artikel)
+        $rekomendasi = Berita::published()
+            ->where('id', '!=', $artikel->id)
+            ->inRandomOrder()
+            ->limit(3)
+            ->get();
+
+        return view('public.berita.show', compact('setting', 'artikel', 'terkait', 'rekomendasi'));
     }
 }

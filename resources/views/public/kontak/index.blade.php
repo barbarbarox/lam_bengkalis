@@ -79,9 +79,9 @@
       </div>
 
       {{-- Formulir Pengaduan --}}
-      <div style="background:white;border-radius:var(--radius);padding:2.5rem;box-shadow:var(--lam-shadow);">
-        <h2 style="font-family:var(--font-head);font-size:1.35rem;color:var(--lam-green);margin-bottom:.5rem;">Kirim Pesan / Pengaduan</h2>
-        <p style="font-size:.875rem;color:var(--lam-text-l);margin-bottom:1.75rem;">
+      <div style="background:var(--lam-bg-alt);border-radius:var(--radius);padding:2.5rem;box-shadow:var(--lam-shadow);">
+        <h2 style="font-family:var(--font-head);font-size:1.35rem;color:var(--lam-gold);margin-bottom:.5rem;">Kirim Pesan / Pengaduan</h2>
+        <p style="font-size:.875rem;color:var(--lam-gold);margin-bottom:1.75rem;">
           Semua kolom bertanda <span style="color:#c0392b;">*</span> wajib diisi.
         </p>
 
@@ -120,7 +120,7 @@
 
             {{-- Nama --}}
             <div style="grid-column:1/-1;">
-              <label for="nama_pengadu" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-text);margin-bottom:.35rem;">
+              <label for="nama_pengadu" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-gold);margin-bottom:.35rem;">
                 Nama Lengkap <span style="color:#c0392b;" aria-hidden="true">*</span>
               </label>
               <input type="text" id="nama_pengadu" name="nama_pengadu" required
@@ -128,60 +128,60 @@
                      style="width:100%;padding:.7rem .875rem;border:1px solid {{ $errors->has('nama_pengadu') ? '#ef4444' : 'var(--lam-border)' }};
                             border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;outline:none;
                             transition:border-color .2s;"
-                     onfocus="this.style.borderColor='var(--lam-green)'"
+                     onfocus="this.style.borderColor='var(--lam-gold)'"
                      onblur="this.style.borderColor='{{ $errors->has('nama_pengadu') ? '#ef4444' : 'var(--lam-border)' }}'">
               @error('nama_pengadu')<p style="color:#ef4444;font-size:.78rem;margin-top:.25rem;">{{ $message }}</p>@enderror
             </div>
 
             {{-- Email --}}
             <div>
-              <label for="email" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-text);margin-bottom:.35rem;">
+              <label for="email" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-gold);margin-bottom:.35rem;">
                 Email <span style="color:#c0392b;" aria-hidden="true">*</span>
               </label>
               <input type="email" id="email" name="email" required
                      value="{{ old('email') }}"
                      style="width:100%;padding:.7rem .875rem;border:1px solid {{ $errors->has('email') ? '#ef4444' : 'var(--lam-border)' }};
                             border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;outline:none;"
-                     onfocus="this.style.borderColor='var(--lam-green)'"
+                     onfocus="this.style.borderColor='var(--lam-gold)'"
                      onblur="this.style.borderColor='{{ $errors->has('email') ? '#ef4444' : 'var(--lam-border)' }}'">
               @error('email')<p style="color:#ef4444;font-size:.78rem;margin-top:.25rem;">{{ $message }}</p>@enderror
             </div>
 
             {{-- Telepon --}}
             <div>
-              <label for="no_telp" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-text);margin-bottom:.35rem;">No. Telepon</label>
+              <label for="no_telp" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-gold);margin-bottom:.35rem;">No. Telepon</label>
               <input type="tel" id="no_telp" name="no_telp"
                      value="{{ old('no_telp') }}"
                      placeholder="Opsional"
                      style="width:100%;padding:.7rem .875rem;border:1px solid var(--lam-border);
                             border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;outline:none;"
-                     onfocus="this.style.borderColor='var(--lam-green)'"
+                     onfocus="this.style.borderColor='var(--lam-gold)'"
                      onblur="this.style.borderColor='var(--lam-border)'">
             </div>
 
             {{-- Subjek --}}
             <div style="grid-column:1/-1;">
-              <label for="subjek" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-text);margin-bottom:.35rem;">
+              <label for="subjek" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-gold);margin-bottom:.35rem;">
                 Subjek <span style="color:#c0392b;" aria-hidden="true">*</span>
               </label>
               <input type="text" id="subjek" name="subjek" required
                      value="{{ old('subjek') }}"
                      style="width:100%;padding:.7rem .875rem;border:1px solid {{ $errors->has('subjek') ? '#ef4444' : 'var(--lam-border)' }};
                             border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;outline:none;"
-                     onfocus="this.style.borderColor='var(--lam-green)'"
+                     onfocus="this.style.borderColor='var(--lam-gold)'"
                      onblur="this.style.borderColor='{{ $errors->has('subjek') ? '#ef4444' : 'var(--lam-border)' }}'">
               @error('subjek')<p style="color:#ef4444;font-size:.78rem;margin-top:.25rem;">{{ $message }}</p>@enderror
             </div>
 
             {{-- Isi --}}
             <div style="grid-column:1/-1;">
-              <label for="isi_aduan" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-text);margin-bottom:.35rem;">
+              <label for="isi_aduan" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-gold);margin-bottom:.35rem;">
                 Isi Pesan / Pengaduan <span style="color:#c0392b;" aria-hidden="true">*</span>
               </label>
               <textarea id="isi_aduan" name="isi_aduan" rows="6" required
                         style="width:100%;padding:.7rem .875rem;border:1px solid {{ $errors->has('isi_aduan') ? '#ef4444' : 'var(--lam-border)' }};
                                border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;outline:none;resize:vertical;"
-                        onfocus="this.style.borderColor='var(--lam-green)'"
+                        onfocus="this.style.borderColor='var(--lam-gold)'"
                         onblur="this.style.borderColor='{{ $errors->has('isi_aduan') ? '#ef4444' : 'var(--lam-border)' }}'">{{ old('isi_aduan') }}</textarea>
               @error('isi_aduan')<p style="color:#ef4444;font-size:.78rem;margin-top:.25rem;">{{ $message }}</p>@enderror
             </div>

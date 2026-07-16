@@ -35,7 +35,7 @@
     <div style="display:grid;grid-template-columns:1fr 320px;gap:3rem;align-items:start;" class="artikel-grid">
 
       {{-- Konten Utama --}}
-      <article style="background:white;border-radius:var(--radius);overflow:hidden;box-shadow:var(--lam-shadow);">
+      <article style="background:var(--lam-bg-alt);border-radius:var(--radius);overflow:hidden;box-shadow:var(--lam-shadow);">
         {{-- Thumbnail --}}
         @if($artikel->thumbnail)
           <img src="{{ Storage::url($artikel->thumbnail) }}"
@@ -87,31 +87,84 @@
 
           {{-- Share --}}
           <div style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--lam-border);
-                      display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
-            <span style="font-size:.8rem;color:var(--lam-text-l);font-weight:600;">Bagikan:</span>
-            <a href="https://wa.me/?text={{ urlencode($artikel->judul . ' — ' . request()->url()) }}"
-               target="_blank" rel="noopener noreferrer"
-               style="padding:.4rem .875rem;border-radius:var(--radius-sm);background:#25D366;
-                      color:white;font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:.35rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-              WhatsApp
-            </a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}"
-               target="_blank" rel="noopener noreferrer"
-               style="padding:.4rem .875rem;border-radius:var(--radius-sm);background:#1877F2;
-                      color:white;font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:.35rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-              Facebook
-            </a>
+                      display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+            <span style="font-size:.9rem;color:var(--lam-text);font-weight:700;font-family:var(--font-head);">Bagikan Artikel:</span>
+            
+            <div class="social-buttons">
+              <a href="https://wa.me/?text={{ urlencode($artikel->judul . ' — ' . request()->url()) }}" target="_blank" class="social-button github" title="Bagikan ke WhatsApp">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+              </a>
+              <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->url()) }}" target="_blank" class="social-button linkedin" title="Bagikan ke LinkedIn">
+                <svg viewBox="0 -2 44 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="Icons" stroke="none" stroke-width="1">
+                    <g transform="translate(-702.000000, -265.000000)">
+                        <path d="M746,305 L736.2754,305 L736.2754,290.9384 C736.2754,287.257796 734.754233,284.74515 731.409219,284.74515 C728.850659,284.74515 727.427799,286.440738 726.765522,288.074854 C726.517168,288.661395 726.555974,289.478453 726.555974,290.295511 L726.555974,305 L716.921919,305 C716.921919,305 717.046096,280.091247 716.921919,277.827047 L726.555974,277.827047 L726.555974,282.091631 C727.125118,280.226996 730.203669,277.565794 735.116416,277.565794 C741.21143,277.565794 746,281.474355 746,289.890824 L746,305 L746,305 Z M707.17921,274.428187 L707.117121,274.428187 C704.0127,274.428187 702,272.350964 702,269.717936 C702,267.033681 704.072201,265 707.238711,265 C710.402634,265 712.348071,267.028559 712.41016,269.710252 C712.41016,272.34328 710.402634,274.428187 707.17921,274.428187 L707.17921,274.428187 L707.17921,274.428187 Z M703.109831,277.827047 L711.685795,277.827047 L711.685795,305 L703.109831,305 L703.109831,277.827047 L703.109831,277.827047 Z" id="LinkedIn"></path>
+                    </g>
+                </g>
+                </svg>
+              </a>
+              <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank" class="social-button facebook" title="Bagikan ke Facebook">
+                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 310 310" xml:space="preserve">
+                  <g id="XMLID_834_">
+                    <path id="XMLID_835_" d="M81.703,165.106h33.981V305c0,2.762,2.238,5,5,5h57.616c2.762,0,5-2.238,5-5V165.765h39.064
+                      c2.54,0,4.677-1.906,4.967-4.429l5.933-51.502c0.163-1.417-0.286-2.836-1.234-3.899c-0.949-1.064-2.307-1.673-3.732-1.673h-44.996
+                      V71.978c0-9.732,5.24-14.667,15.576-14.667c1.473,0,29.42,0,29.42,0c2.762,0,5-2.239,5-5V5.037c0-2.762-2.238-5-5-5h-40.545
+                      C187.467,0.023,186.832,0,185.896,0c-7.035,0-31.488,1.381-50.804,19.151c-21.402,19.692-18.427,43.27-17.716,47.358v37.752H81.703
+                      c-2.762,0-5,2.238-5,5v50.844C76.703,162.867,78.941,165.106,81.703,165.106z"></path>
+                  </g>
+                </svg>
+              </a>
+              <a href="#" class="social-button instagram" title="Bagikan">
+                <svg width="800px" height="800px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                  <g id="Page-1" stroke="none" stroke-width="1">
+                      <g id="Dribbble-Light-Preview" transform="translate(-340.000000, -7439.000000)">
+                          <g id="icons" transform="translate(56.000000, 160.000000)">
+                              <path d="M289.869652,7279.12273 C288.241769,7279.19618 286.830805,7279.5942 285.691486,7280.72871 C284.548187,7281.86918 284.155147,7283.28558 284.081514,7284.89653 C284.035742,7285.90201 283.768077,7293.49818 284.544207,7295.49028 C285.067597,7296.83422 286.098457,7297.86749 287.454694,7298.39256 C288.087538,7298.63872 288.809936,7298.80547 289.869652,7298.85411 C298.730467,7299.25511 302.015089,7299.03674 303.400182,7295.49028 C303.645956,7294.859 303.815113,7294.1374 303.86188,7293.08031 C304.26686,7284.19677 303.796207,7282.27117 302.251908,7280.72871 C301.027016,7279.50685 299.5862,7278.67508 289.869652,7279.12273 M289.951245,7297.06748 C288.981083,7297.0238 288.454707,7296.86201 288.103459,7296.72603 C287.219865,7296.3826 286.556174,7295.72155 286.214876,7294.84312 C285.623823,7293.32944 285.819846,7286.14023 285.872583,7284.97693 C285.924325,7283.83745 286.155174,7282.79624 286.959165,7281.99226 C287.954203,7280.99968 289.239792,7280.51332 297.993144,7280.90837 C299.135448,7280.95998 300.179243,7281.19026 300.985224,7281.99226 C301.980262,7282.98483 302.473801,7284.28014 302.071806,7292.99991 C302.028024,7293.96767 301.865833,7294.49274 301.729513,7294.84312 C300.829003,7297.15085 298.757333,7297.47145 289.951245,7297.06748 M298.089663,7283.68956 C298.089663,7284.34665 298.623998,7284.88065 299.283709,7284.88065 C299.943419,7284.88065 300.47875,7284.34665 300.47875,7283.68956 C300.47875,7283.03248 299.943419,7282.49847 299.283709,7282.49847 C298.623998,7282.49847 298.089663,7283.03248 298.089663,7283.68956 M288.862673,7288.98792 C288.862673,7291.80286 291.150266,7294.08479 293.972194,7294.08479 C296.794123,7294.08479 299.081716,7291.80286 299.081716,7288.98792 C299.081716,7286.17298 296.794123,7283.89205 293.972194,7283.89205 C291.150266,7283.89205 288.862673,7286.17298 288.862673,7288.98792 M290.655732,7288.98792 C290.655732,7287.16159 292.140329,7285.67967 293.972194,7285.67967 C295.80406,7285.67967 297.288657,7287.16159 297.288657,7288.98792 C297.288657,7290.81525 295.80406,7292.29716 293.972194,7292.29716 C292.140329,7292.29716 290.655732,7290.81525 290.655732,7288.98792" id="instagram-[#167]"></path>
+                          </g>
+                      </g>
+                  </g>
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
       </article>
+
+      {{-- Fitur Rekomendasi Artikel Lainnya --}}
+      @if(isset($rekomendasi) && $rekomendasi->count() > 0)
+      <div style="margin-top: 3rem;">
+        <h2 style="font-family:var(--font-head);font-size:1.6rem;color:var(--lam-text);margin-bottom:1.5rem;display:inline-block;border-bottom:3px solid var(--lam-gold);padding-bottom:.5rem;">
+          Rekomendasi Artikel Lainnya
+        </h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.5rem;">
+          @foreach($rekomendasi as $rek)
+            <a href="{{ route('berita.show', $rek->slug) }}" style="display:flex;flex-direction:column;background:var(--lam-bg-alt);border-radius:var(--radius);overflow:hidden;box-shadow:var(--lam-shadow);transition:transform var(--transition);text-decoration:none;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+              @if($rek->thumbnail)
+                <img src="{{ Storage::url($rek->thumbnail) }}" alt="{{ $rek->judul }}" style="width:100%;height:140px;object-fit:cover;" loading="lazy">
+              @else
+                <div style="width:100%;height:140px;background:var(--lam-cream);display:flex;align-items:center;justify-content:center;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="var(--lam-green)" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+              @endif
+              <div style="padding:1rem;">
+                <h3 style="font-size:.95rem;color:var(--lam-text);line-height:1.4;margin-bottom:.5rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $rek->judul }}</h3>
+                <time style="font-size:.75rem;color:var(--lam-text-l);">{{ $rek->tanggal_publish?->translatedFormat('d M Y') }}</time>
+              </div>
+            </a>
+          @endforeach
+        </div>
+      </div>
+      @endif
+      
+      </div>
+      
+      <div>
 
       {{-- Sidebar --}}
       <aside>
         {{-- Berita Terkait --}}
         @if($terkait->count() > 0)
-          <div style="background:white;border-radius:var(--radius);padding:1.5rem;box-shadow:var(--lam-shadow);margin-bottom:1.5rem;">
+          <div style="background:var(--lam-bg-alt);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--lam-shadow);margin-bottom:1.5rem;">
             <h2 style="font-family:var(--font-head);font-size:1.1rem;color:var(--lam-green);margin-bottom:1.25rem;
                         padding-bottom:.75rem;border-bottom:2px solid var(--lam-gold);">
               Berita Terkait
@@ -148,7 +201,7 @@
         {{-- Kembali ke list --}}
         <a href="{{ route('berita.index') }}"
            style="display:flex;align-items:center;gap:.5rem;font-size:.875rem;font-weight:600;
-                  color:var(--lam-green);padding:1rem 1.25rem;background:white;
+                  color:var(--lam-green);padding:1rem 1.25rem;background:var(--lam-bg-alt);
                   border-radius:var(--radius);box-shadow:var(--lam-shadow);">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
           Kembali ke Daftar Berita
@@ -181,6 +234,54 @@
   @media (max-width:600px) {
     article div[style*="padding:2rem"] { padding:1.25rem !important; }
   }
+
+  /* Share buttons animation from Uiverse */
+  .social-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    padding: 10px 0;
+  }
+  .social-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin: 0 8px;
+    background-color: var(--lam-bg);
+    box-shadow: 0px 0px 4px rgba(0,0,0,0.15);
+    transition: 0.3s;
+  }
+  .social-button:hover {
+    background-color: var(--lam-bg-alt);
+    box-shadow: 0px 0px 8px 3px rgba(0,0,0,0.15);
+    transform: translateY(-3px);
+  }
+  .social-buttons svg {
+    transition: 0.3s;
+    height: 20px;
+    width: 20px;
+  }
+  .facebook { background-color: #3b5998; }
+  .facebook svg { fill: #f2f2f2; }
+  .facebook:hover svg { fill: #3b5998; }
+  
+  .github { background-color: #25D366; /* Adapted github color to Whatsapp for context */ }
+  .github svg { fill: #f2f2f2; }
+  .github:hover svg { fill: #25D366; }
+  
+  .linkedin { background-color: #0077b5; }
+  .linkedin svg { fill: #f2f2f2; }
+  .linkedin:hover svg { fill: #0077b5; }
+  
+  .instagram { background-color: #c13584; }
+  .instagram svg { fill: #f2f2f2; }
+  .instagram:hover svg { fill: #c13584; }
+
+  /* Ensure correct hover icon colors based on theme if needed, but Uiverse sets fill explicitly */
 </style>
 
 @endsection

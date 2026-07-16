@@ -93,8 +93,8 @@
             <ol style="list-style:none;counter-reset:misi-counter;display:flex;flex-direction:column;gap:.875rem;">
               @foreach($misiPoin as $idx => $poin)
                 <li style="counter-increment:misi-counter;display:flex;gap:1rem;align-items:flex-start;
-                           background:white;border-radius:var(--radius-sm);padding:1rem 1.25rem;
-                           box-shadow:0 2px 8px rgba(11,79,48,.07);border-left:4px solid var(--lam-gold);">
+                           background:var(--lam-bg-alt);border-radius:var(--radius-sm);padding:1rem 1.25rem;
+                           box-shadow:0 2px 8px rgba(0,0,0,.5);border-left:4px solid var(--lam-gold);">
                   <span style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--lam-gold);
                                color:var(--lam-green);font-weight:700;font-size:.8rem;
                                display:flex;align-items:center;justify-content:center;">{{ $loop->iteration }}</span>
@@ -213,7 +213,7 @@
         .org-card {
           width: 200px;
           text-align: center;
-          background: white;
+          background: var(--lam-bg-alt);
           border-radius: var(--radius);
           padding: 1.5rem 1rem;
           box-shadow: 0 4px 15px rgba(11,79,48,.08);
@@ -432,7 +432,7 @@
     height: 24px;
     right: -12px;
     background-color: white;
-    border: 4px solid var(--lam-green);
+    border: 4px solid var(--lam-gold);
     top: 24px;
     border-radius: 50%;
     z-index: 1;
@@ -441,16 +441,22 @@
   .timeline-content {
     padding: 1.5rem;
     background-color: white;
+    border: 2px solid var(--lam-gold);
     position: relative;
     border-radius: var(--radius);
-    box-shadow: 0 4px 15px rgba(11,79,48,.08);
+    box-shadow: var(--lam-shadow);
   }
   .timeline-content h3 {
     margin-top: 0;
-    color: var(--lam-green);
+    color: var(--lam-black);
     font-family: var(--font-head);
     font-size: 1.5rem;
     margin-bottom: 1rem;
+  }
+  .timeline-content .prose-konten, 
+  .timeline-content .prose-konten p,
+  .timeline-content .prose-konten li {
+    color: var(--lam-black-l);
   }
   .timeline-img {
     width: 100%;
