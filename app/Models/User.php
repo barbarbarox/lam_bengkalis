@@ -12,15 +12,22 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laragear\TwoFactor\TwoFactorAuthentication;
 use Spatie\Permission\Traits\HasRoles;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
 use Laragear\TwoFactor\Contracts\TwoFactorAuthenticatable;
 
 #[Fillable(['name', 'email', 'password', 'role', 'is_active'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements TwoFactorAuthenticatable
+class User extends Authenticatable implements TwoFactorAuthenticatable, FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles, TwoFactorAuthentication;
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->is_active;
+    }
 
     // ── Constants ───────────────────────────────────────────────────────────
 

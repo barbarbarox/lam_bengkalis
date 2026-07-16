@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\ProfilKonten;
 use App\Services\HtmlSanitizer;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -27,7 +28,7 @@ class ProfilPage extends Page implements HasForms
     protected static string  $view            = 'filament.pages.profil-page';
 
     // State fields per konten
-    public ?string $sejarah_konten     = null;
+    public array   $sejarah_konten     = [];
     public ?string $visi_konten        = null;
     public array   $misi_poin          = [];
     public ?string $tugas_fungsi_konten = null;
@@ -42,8 +43,10 @@ class ProfilPage extends Page implements HasForms
 
     public function mount(): void
     {
+        $sejarahRaw = $this->loadKonten('sejarah-lam');
+        $sejarahDecoded = json_decode($sejarahRaw ?? '[]', true);
         $this->sejarahForm->fill([
-            'sejarah_konten' => $this->loadKonten('sejarah-lam'),
+            'sejarah_konten' => is_array($sejarahDecoded) ? $sejarahDecoded : [],
         ]);
 
         $misiRaw = $this->loadKonten('misi-lam');
@@ -84,17 +87,32 @@ class ProfilPage extends Page implements HasForms
     public function sejarahForm(Form $form): Form
     {
         return $form->schema([
-            Section::make('Sejarah LAM Bengkalis')
+            Section::make('Sejarah LAM Bengkalis (Timeline)')
                 ->icon('heroicon-o-clock')
                 ->schema([
-                    RichEditor::make('sejarah_konten')
-                        ->label('Isi Sejarah')
-                        ->required()
-                        ->toolbarButtons([
-                            'bold', 'italic', 'underline', 'strike',
-                            'h2', 'h3', 'bulletList', 'orderedList',
-                            'blockquote', 'link', 'redo', 'undo',
+                    Repeater::make('sejarah_konten')
+                        ->label('Item Sejarah')
+                        ->schema([
+                            TextInput::make('tahun')
+                                ->label('Tahun / Judul')
+                                ->required()
+                                ->maxLength(255),
+                            FileUpload::make('gambar')
+                                ->label('Gambar (Opsional)')
+                                ->image()
+                                ->directory('sejarah'),
+                            RichEditor::make('deskripsi')
+                                ->label('Deskripsi')
+                                ->required()
+                                ->toolbarButtons([
+                                    'bold', 'italic', 'underline', 'strike',
+                                    'bulletList', 'orderedList',
+                                    'link', 'redo', 'undo',
+                                ])
                         ])
+                        ->reorderable()
+                        ->cloneable()
+                        ->addActionLabel('Tambah Item Sejarah')
                         ->columnSpanFull(),
                 ]),
         ])->statePath('');
@@ -175,10 +193,11 @@ class ProfilPage extends Page implements HasForms
     public function saveSejarah(): void
     {
         $data = $this->sejarahForm->getState();
+        $sejarahList = $data['sejarah_konten'] ?? [];
         $this->saveKonten(
             'sejarah-lam',
             'Sejarah LAM Bengkalis',
-            HtmlSanitizer::clean($data['sejarah_konten'] ?? '')
+            json_encode(array_values($sejarahList), JSON_UNESCAPED_UNICODE)
         );
         $this->notifSuccess('Sejarah berhasil disimpan');
     }

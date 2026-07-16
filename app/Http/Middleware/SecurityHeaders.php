@@ -26,7 +26,7 @@ class SecurityHeaders
         'X-XSS-Protection'          => '1; mode=block',
         'Permissions-Policy'        => 'camera=(), microphone=(), geolocation=()',
         'Content-Security-Policy'   => "default-src 'self'; "
-            . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://fonts.googleapis.com; "
+            . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://fonts.googleapis.com https://cdn.jsdelivr.net; "
             . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net; "
             . "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net; "
             . "img-src 'self' data: https:; "

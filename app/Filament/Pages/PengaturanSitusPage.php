@@ -246,10 +246,10 @@ class PengaturanSitusPage extends Page implements HasForms
 
         SiteSetting::updateSettings([
             'meta_keywords' => $json,
-            'facebook_url'  => $urls->get('facebook.url') ?? $urls->get('facebook')?->offsetGet('url'),
-            'instagram_url' => $urls->get('instagram.url') ?? $urls->get('instagram')?->offsetGet('url') ?? null,
-            'youtube_url'   => $urls->get('youtube.url') ?? $urls->get('youtube')?->offsetGet('url') ?? null,
-            'twitter_url'   => $urls->get('twitter.url') ?? $urls->get('twitter')?->offsetGet('url') ?? null,
+            'facebook_url'  => $urls->get('facebook.url') ?? ($urls->get('facebook')['url'] ?? null),
+            'instagram_url' => $urls->get('instagram.url') ?? ($urls->get('instagram')['url'] ?? null),
+            'youtube_url'   => $urls->get('youtube.url') ?? ($urls->get('youtube')['url'] ?? null),
+            'twitter_url'   => $urls->get('twitter.url') ?? ($urls->get('twitter')['url'] ?? null),
         ]);
 
         Notification::make()

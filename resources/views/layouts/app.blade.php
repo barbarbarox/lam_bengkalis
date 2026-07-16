@@ -115,58 +115,84 @@
     /* ─── Navbar ───────────────────────────────────────────────── */
     .navbar {
       position: sticky; top: 0; z-index: 100;
-      background: var(--lam-green);
-      box-shadow: 0 2px 12px rgba(0,0,0,.25);
+      background: rgba(11,79,48,.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0,0,0,.15);
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      transition: all var(--transition);
     }
     .navbar__inner {
       display: flex; align-items: center; justify-content: space-between;
-      height: 64px;
+      height: 80px;
     }
     .navbar__brand {
-      display: flex; align-items: center; gap: .75rem;
+      display: flex; align-items: center; gap: 1rem;
     }
     .navbar__brand-logo {
-      width: 40px; height: 40px; border-radius: 50%;
-      object-fit: contain; background: var(--lam-cream);
+      width: 48px; height: 48px; border-radius: 50%;
+      object-fit: contain; background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,.15);
     }
     .navbar__brand-text {
       display: flex; flex-direction: column;
     }
     .navbar__brand-name {
-      font-family: var(--font-head); font-size: 1rem;
+      font-family: var(--font-head); font-size: 1.15rem;
       font-weight: 700; color: var(--lam-gold); line-height: 1.1;
+      letter-spacing: .02em;
     }
     .navbar__brand-sub {
-      font-size: .65rem; color: rgba(255,255,255,.65);
-      letter-spacing: .12em; text-transform: uppercase;
+      font-size: .7rem; color: rgba(255,255,255,.8);
+      letter-spacing: .15em; text-transform: uppercase;
+      margin-top: .1rem;
     }
 
     .navbar__nav {
-      display: flex; align-items: center; gap: .25rem;
+      display: flex; align-items: center; gap: 1.5rem;
     }
     .navbar__link {
-      padding: .5rem .875rem; border-radius: var(--radius-sm);
-      color: rgba(255,255,255,.85); font-size: .875rem; font-weight: 500;
-      transition: color var(--transition), background var(--transition);
+      position: relative;
+      padding: .5rem 0; 
+      color: rgba(255,255,255,.9); font-size: .9rem; font-weight: 500;
+      transition: color var(--transition);
+    }
+    .navbar__link::after {
+      content: ''; position: absolute; left: 0; bottom: 0;
+      width: 0; height: 2px; background: var(--lam-gold);
+      transition: width var(--transition);
+      border-radius: 2px;
     }
     .navbar__link:hover,
     .navbar__link.is-active {
-      color: var(--lam-gold); background: rgba(255,255,255,.08);
+      color: var(--lam-gold); 
+    }
+    .navbar__link:hover::after,
+    .navbar__link.is-active::after {
+      width: 100%;
     }
     .navbar__museum-btn {
-      margin-left: .5rem; padding: .45rem 1rem;
-      background: var(--lam-gold); color: var(--lam-green);
-      border-radius: var(--radius-sm); font-size: .8rem; font-weight: 700;
-      transition: background var(--transition);
+      display: inline-flex; align-items: center; gap: .5rem;
+      margin-left: .5rem; padding: .6rem 1.25rem;
+      background: linear-gradient(135deg, var(--lam-gold), var(--lam-gold-d));
+      color: var(--lam-green-d);
+      border-radius: 50px;
+      font-size: .85rem; font-weight: 700;
+      letter-spacing: .03em;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+      transition: all var(--transition);
     }
-    .navbar__museum-btn:hover { background: var(--lam-gold-d); }
+    .navbar__museum-btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+    }
 
     .navbar__hamburger {
       display: none; flex-direction: column; gap: 5px;
       padding: .5rem; cursor: pointer; background: none; border: none;
     }
     .navbar__hamburger span {
-      display: block; width: 22px; height: 2px;
+      display: block; width: 24px; height: 2px;
       background: white; border-radius: 2px;
       transition: transform .25s, opacity .25s;
     }
@@ -174,14 +200,30 @@
     /* Mobile nav */
     .navbar__mobile {
       display: none; flex-direction: column;
-      background: var(--lam-green-d); padding: .5rem 0 1rem;
+      background: rgba(8,61,36,.98);
+      backdrop-filter: blur(10px);
+      padding: 1rem 0;
+      border-top: 1px solid rgba(255,255,255,.05);
     }
     .navbar__mobile-link {
-      padding: .75rem 1.25rem; color: rgba(255,255,255,.85);
-      font-size: .9rem; font-weight: 500;
+      padding: .85rem 1.5rem; color: rgba(255,255,255,.9);
+      font-size: .95rem; font-weight: 500;
       transition: color var(--transition), background var(--transition);
+      border-left: 3px solid transparent;
     }
-    .navbar__mobile-link:hover { color: var(--lam-gold); background: rgba(255,255,255,.05); }
+    .navbar__mobile-link:hover { 
+      color: var(--lam-gold); 
+      background: rgba(255,255,255,.05); 
+      border-left-color: var(--lam-gold);
+    }
+    .navbar__mobile-museum-btn {
+      margin: 1rem 1.5rem .5rem;
+      padding: .75rem; text-align: center;
+      background: var(--lam-gold); color: var(--lam-green-d);
+      border-radius: var(--radius-sm); font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+    }
 
     @media (max-width: 768px) {
       .navbar__nav { display: none; }
@@ -285,10 +327,19 @@
       <a href="{{ route('profil') }}"       class="navbar__link {{ Request::routeIs('profil')       ? 'is-active' : '' }}">Profil</a>
       <a href="{{ route('berita.index') }}" class="navbar__link {{ Request::routeIs('berita.*')     ? 'is-active' : '' }}">Berita</a>
       <a href="{{ route('kontak') }}"       class="navbar__link {{ Request::routeIs('kontak')       ? 'is-active' : '' }}">Kontak</a>
-      @if($setting->url_museum)
-        <a href="{{ route('museum') }}" class="navbar__museum-btn" target="_blank" rel="noopener noreferrer"
+      
+      @php
+        $urlMuseum = '';
+        if ($setting->meta_keywords) {
+          $decodedMeta = json_decode($setting->meta_keywords, true);
+          $urlMuseum = $decodedMeta['url_museum'] ?? '';
+        }
+      @endphp
+
+      @if($urlMuseum)
+        <a href="{{ $urlMuseum }}" class="navbar__museum-btn" target="_blank" rel="noopener noreferrer"
            title="Buka Jejak Layar (Museum Digital) — tab baru">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           Museum
         </a>
       @endif
@@ -304,15 +355,27 @@
     </button>
   </div>
 
-  {{-- Mobile Dropdown --}}
+    {{-- Mobile Dropdown --}}
   <nav id="mobile-nav" class="navbar__mobile" :class="open ? 'is-open' : ''"
        role="navigation" aria-label="Navigasi Mobile">
     <a href="{{ route('beranda') }}"      class="navbar__mobile-link" @click="open=false">Beranda</a>
     <a href="{{ route('profil') }}"       class="navbar__mobile-link" @click="open=false">Profil Lembaga</a>
     <a href="{{ route('berita.index') }}" class="navbar__mobile-link" @click="open=false">Berita</a>
     <a href="{{ route('kontak') }}"       class="navbar__mobile-link" @click="open=false">Kontak</a>
-    @if($setting->url_museum)
-      <a href="{{ route('museum') }}" class="navbar__mobile-link" target="_blank" rel="noopener noreferrer">Jejak Layar (Museum)</a>
+    
+    @php
+      $urlMuseum = '';
+      if ($setting->meta_keywords) {
+        $decodedMeta = json_decode($setting->meta_keywords, true);
+        $urlMuseum = $decodedMeta['url_museum'] ?? '';
+      }
+    @endphp
+
+    @if($urlMuseum)
+      <a href="{{ $urlMuseum }}" class="navbar__mobile-museum-btn" target="_blank" rel="noopener noreferrer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Jejak Layar (Museum)
+      </a>
     @endif
   </nav>
 </header>

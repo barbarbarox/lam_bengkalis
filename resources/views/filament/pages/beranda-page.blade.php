@@ -1,7 +1,7 @@
 <x-filament-panels::page>
     {{-- ── Sambutan BPH ───────────────────────────────────────────────────────── --}}
     <x-filament::section>
-        <x-slot name="heading">Sambutan Ketua BPH</x-slot>
+        <x-slot name="heading">Sambutan Dewan Pimpinan Harian</x-slot>
         <x-slot name="description">Pesan sambutan yang ditampilkan di halaman beranda.</x-slot>
 
         {{ $this->sambutan_bphForm }}

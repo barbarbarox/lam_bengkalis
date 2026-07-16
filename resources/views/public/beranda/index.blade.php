@@ -9,8 +9,7 @@
 ════════════════════════════════════════════════════════════════ --}}
 <section
   id="hero"
-  x-data="backgroundCarousel({{ $slides->toJson() }})"
-  x-init="init()"
+  x-data="backgroundCarousel(window.lamSlidesData)"
   style="position:relative;height:100svh;min-height:540px;max-height:900px;overflow:hidden;"
   aria-label="Gambar latar beranda"
 >
@@ -19,7 +18,7 @@
     @forelse($slides as $i => $slide)
       <div
         style="position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 800ms ease;background-image:url('{{ Storage::url($slide->image_path) }}')"
-        :style="currentSlide === {{ $i }} ? 'opacity:1' : 'opacity:0'"
+        :style="{ opacity: currentSlide === {{ $i }} ? 1 : 0 }"
         role="img"
         :aria-label="slides[{{ $i }}]?.alt_text || ''"
       ></div>
@@ -57,7 +56,7 @@
           @click="goTo({{ $i }})"
           :class="currentSlide === {{ $i }} ? 'is-active' : ''"
           style="width:8px;height:8px;border-radius:50%;border:none;background:rgba(255,255,255,.4);cursor:pointer;transition:background .3s,width .3s,border-radius .3s;"
-          :style="currentSlide === {{ $i }} ? 'background:var(--lam-gold);width:24px;border-radius:4px;' : ''"
+          :style="{ background: currentSlide === {{ $i }} ? 'var(--lam-gold)' : 'rgba(255,255,255,.4)', width: currentSlide === {{ $i }} ? '24px' : '8px', borderRadius: currentSlide === {{ $i }} ? '4px' : '50%' }"
           role="tab" :aria-selected="currentSlide === {{ $i }}"
           :aria-label="'Slide ' + ({{ $i }} + 1)"
         ></button>
@@ -109,7 +108,7 @@
       <div>
         <div class="section-heading" style="text-align:left;margin-bottom:1.5rem;">
           <span class="section-heading__eyebrow">Sambutan</span>
-          <h2 class="section-heading__title">Kata Sambutan Ketua BPH</h2>
+          <h2 class="section-heading__title">Kata Sambutan Dewan Pimpinan Harian</h2>
           <div class="section-heading__divider" style="justify-content:flex-start;">
             <span></span><i></i><span></span>
           </div>
@@ -123,7 +122,7 @@
 </section>
 
 <style>
-  .sambutan-konten p { margin-bottom: 1rem; }
+  .sambutan-konten p { margin-bottom: 1rem; text-align: justify; }
   @media (max-width: 768px) {
     .sambutan-grid { grid-template-columns: 1fr !important; }
     .sambutan-grid > div:first-child { display: none; }
@@ -138,19 +137,18 @@
 <section class="section-pad-sm" style="background:var(--lam-cream-d);">
   <div class="container">
     <div
-      x-data="bannerCarousel({{ $banners->toJson() }})"
-      x-init="init()"
+      x-data="bannerCarousel(window.lamBannersData)"
       style="position:relative;border-radius:var(--radius);overflow:hidden;"
     >
       {{-- Slides --}}
       <div
         style="display:flex;transition:transform .45s ease;"
-        :style="'transform:translateX(-' + (currentIndex * 100) + '%)'"
+        :style="{ transform: 'translateX(-' + (currentIndex * 100) + '%)' }"
         @touchstart.passive="touchStartX = $event.changedTouches[0].clientX"
         @touchend.passive="handleSwipe($event.changedTouches[0].clientX)"
       >
         @foreach($banners as $banner)
-          <div style="min-width:100%;position:relative;">
+          <div style="min-width:100%;position:relative;flex-shrink:0;">
             @if($banner->link_url)
               <a href="{{ $banner->link_url }}" target="_blank" rel="noopener noreferrer"
                  aria-label="{{ $banner->alt_text ?? 'Banner' }}">
@@ -186,7 +184,7 @@
         <div style="position:absolute;bottom:.75rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;">
           @foreach($banners as $i => $banner)
             <button @click="goTo({{ $i }})"
-                    :style="currentIndex === {{ $i }} ? 'background:var(--lam-gold);width:20px;border-radius:3px;' : 'background:rgba(255,255,255,.5);'"
+                    :style="{ background: currentIndex === {{ $i }} ? 'var(--lam-gold)' : 'rgba(255,255,255,.5)', width: currentIndex === {{ $i }} ? '20px' : '8px', borderRadius: currentIndex === {{ $i }} ? '3px' : '50%' }"
                     style="width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;transition:all .3s;"
                     :aria-label="'Banner ' + ({{ $i }} + 1)" :aria-current="currentIndex === {{ $i }}"></button>
           @endforeach
@@ -270,6 +268,9 @@
 
 @push('body_scripts')
 <script>
+window.lamSlidesData = @json($slides);
+window.lamBannersData = @json($banners);
+
 function backgroundCarousel(slidesData) {
   return {
     slides:       slidesData,

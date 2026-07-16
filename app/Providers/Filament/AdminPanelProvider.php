@@ -42,7 +42,13 @@ class AdminPanelProvider extends PanelProvider
             ->id('pentadbir')
             ->path('pentadbir')
             ->brandName('LAM Bengkalis')
-            ->brandLogo(fn () => asset('images/logo-lam.png')) // fallback ke nama jika file belum ada
+            ->brandLogo(function () {
+                $setting = \App\Models\SiteSetting::first();
+                if ($setting && $setting->logo_path) {
+                    return \Illuminate\Support\Facades\Storage::url($setting->logo_path);
+                }
+                return asset('images/logo-lam.gif');
+            })
 
             // ── Auth & Keamanan ───────────────────────────────────────────────
             ->login(PentadbirLogin::class)      // login page kustom dengan rate limiting

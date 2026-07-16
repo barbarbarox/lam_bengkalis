@@ -105,4 +105,16 @@ class SiteSetting extends Model
             'SiteSetting adalah singleton. Gunakan SiteSetting::updateSettings([...]) untuk mengubah nilai.'
         );
     }
+
+    /**
+     * Accessor untuk mendapatkan url_museum dari JSON meta_keywords
+     */
+    public function getUrlMuseumAttribute(): ?string
+    {
+        if ($this->meta_keywords) {
+            $decoded = json_decode($this->meta_keywords, true);
+            return $decoded['url_museum'] ?? null;
+        }
+        return null;
+    }
 }

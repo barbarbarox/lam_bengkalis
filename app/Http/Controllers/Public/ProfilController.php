@@ -24,6 +24,21 @@ class ProfilController extends Controller
             $misiPoin = is_array($decoded) ? $decoded : [];
         }
 
+        // Sejarah Timeline: parse JSON dari profil 'sejarah-lam'
+        $sejarahRaw = $konten->get('sejarah-lam')?->konten;
+        $sejarahTimeline = [];
+        if ($sejarahRaw) {
+            $decoded = json_decode($sejarahRaw, true);
+            if (is_array($decoded)) {
+                $sejarahTimeline = $decoded;
+            } elseif (is_string($sejarahRaw) && trim($sejarahRaw) !== '') {
+                // Fallback untuk konten lama yang masih berupa HTML string
+                $sejarahTimeline = [
+                    ['tahun' => 'Sejarah', 'deskripsi' => $sejarahRaw, 'gambar' => null]
+                ];
+            }
+        }
+
         // Struktur Organisasi
         $strukturMka = StrukturOrganisasi::aktif()
             ->kategori(StrukturOrganisasi::KATEGORI_MKA)
@@ -34,7 +49,7 @@ class ProfilController extends Controller
             ->get();
 
         return view('public.profil.index', compact(
-            'setting', 'konten', 'misiPoin', 'strukturMka', 'strukturDph'
+            'setting', 'konten', 'misiPoin', 'sejarahTimeline', 'strukturMka', 'strukturDph'
         ));
     }
 }
