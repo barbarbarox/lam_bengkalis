@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Public\BerandaController;
 use App\Http\Controllers\Public\BeritaController;
+use App\Http\Controllers\Public\GaleriController;
 use App\Http\Controllers\Public\KontakController;
 use App\Http\Controllers\Public\ProfilController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,9 @@ Route::get('/profil', ProfilController::class)->name('profil');
 // Berita
 Route::get('/berita', [BeritaController::class, 'index'])->name('berita.index');
 Route::get('/berita/{slug}', [BeritaController::class, 'show'])->name('berita.show');
+
+// Galeri Foto
+Route::get('/galeri', [GaleriController::class, 'index'])->name('galeri');
 
 // Kontak & Aduan
 Route::get('/kontak', [KontakController::class, 'index'])->name('kontak');

@@ -33,54 +33,65 @@
   <style>
     /* ─── Design Tokens ────────────────────────────────────────── */
     :root {
-      /* Light Mode Palette */
-      --lam-bg:      #fafaf9;
-      --lam-bg-alt:  #ffffff;
-      --lam-text:    #3E2716;
-      --lam-text-m:  #5C3A21;
-      --lam-text-l:  #7B4F2D;
-      
+      /* ── Warna Resmi LAM Bengkalis ── */
+      /* Kuning Emas — kebesaran & kemuliaan */
+      --lam-gold:    #F99522;
+      --lam-gold-d:  #d97c0e;
+      --lam-gold-l:  #FFC90E;
+      /* Hijau Tua — kesuburan & nilai keislaman */
+      --lam-green:   #008000;
+      --lam-green-d: #006600;
+      --lam-green-l: #009900;
+      /* Merah — teks / aksen */
+      --lam-red:     #EB2D3A;
+      --lam-red-d:   #c71f2b;
+      /* Hitam — dominan layout */
       --lam-black:   #121212;
       --lam-black-d: #080808;
-      --lam-black-l: #1f1f1f;
-      --lam-gold:    #D4A017;
-      --lam-gold-d:  #b8860b;
-      --lam-brown:   #5C3A21;
-      --lam-brown-d: #3E2716;
-      --lam-brown-l: #7B4F2D;
-      
-      --lam-border:  rgba(92,58,33,.2);
-      --lam-shadow:  0 4px 24px rgba(0,0,0,.08);
-      
-      /* Maintain compatibility if used in sub-views */
-      --lam-green:   var(--lam-black);
-      --lam-green-d: var(--lam-black-d);
-      --lam-green-l: var(--lam-black-l);
-      --lam-maroon:  var(--lam-brown);
+      --lam-black-l: #1e1e1e;
+      /* Alias cokelat → hitam (kompatibilitas sub-views) */
+      --lam-brown:   #121212;
+      --lam-brown-d: #080808;
+      --lam-brown-l: #1e1e1e;
+      --lam-maroon:  #1e1e1e;
+
+      /* Light Mode */
+      --lam-bg:      #f8f8f6;
+      --lam-bg-alt:  #ffffff;
+      --lam-text:    #111111;
+      --lam-text-m:  #333333;
+      --lam-text-l:  #555555;
       --lam-cream:   var(--lam-bg);
       --lam-cream-d: var(--lam-bg-alt);
-      
+
+      --lam-border:  rgba(249,149,34,.25);
+      --lam-shadow:  0 4px 24px rgba(0,0,0,.10);
+
+      /* Navbar — SELALU hitam (tidak berubah di mode terang/gelap) */
+      --lam-nav-bg:  rgba(12, 12, 12, 0.97);
+
       --font-head:   'Playfair Display', Georgia, serif;
       --font-body:   'Inter', system-ui, sans-serif;
       --radius:      .75rem;
       --radius-sm:   .375rem;
       --transition:  .25s ease;
-      
-      --lam-nav-bg:  rgba(62, 39, 22, 0.98); /* Brown for light mode */
     }
 
     [data-theme="dark"] {
-      /* Dark Mode Palette */
-      --lam-bg:      #18181b;
-      --lam-bg-alt:  #27272a;
+      /* Dark Mode — background gelap, teks terang */
+      --lam-bg:      #111111;
+      --lam-bg-alt:  #1a1a1a;
       --lam-text:    #F5F5F5;
-      --lam-text-m:  #e5e7eb;
-      --lam-text-l:  #A3A3A3;
-      
-      --lam-border:  rgba(212,160,23,.2);
-      --lam-shadow:  0 0 0 1px var(--lam-brown); /* Replaces shadow with subtle brown border */
-      
-      --lam-nav-bg:  rgba(18, 18, 18, 0.98); /* Black for dark mode */
+      --lam-text-m:  #e0e0e0;
+      --lam-text-l:  #a0a0a0;
+      --lam-cream:   var(--lam-bg);
+      --lam-cream-d: var(--lam-bg-alt);
+
+      --lam-border:  rgba(249,149,34,.2);
+      --lam-shadow:  0 4px 24px rgba(0,0,0,.4);
+
+      /* Navbar tetap hitam di dark mode juga */
+      --lam-nav-bg:  rgba(8, 8, 8, 0.98);
     }
 
     /* ─── Reset & Base ─────────────────────────────────────────── */
@@ -209,21 +220,59 @@
     .navbar__link.is-active::after {
       width: 100%;
     }
-    .navbar__museum-btn {
-      display: inline-flex; align-items: center; gap: .5rem;
-      margin-left: .5rem; padding: .6rem 1.25rem;
-      background: linear-gradient(135deg, var(--lam-gold), var(--lam-gold-d));
-      color: var(--lam-black);
-      border-radius: 50px;
-      font-size: .85rem; font-weight: 700;
-      letter-spacing: .03em;
-      box-shadow: 0 4px 15px rgba(212, 160, 23, 0.25);
-      transition: all var(--transition);
+    /* Dropdown Layanan */
+    .navbar__dropdown {
+      position: relative;
     }
-    .navbar__museum-btn:hover { 
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(212, 160, 23, 0.4);
+    .navbar__dropdown-btn {
+      display: flex; align-items: center; gap: .35rem;
+      padding: .5rem 0;
+      color: rgba(255,255,255,.85); font-size: .9rem; font-weight: 500;
+      background: none; border: none; cursor: pointer;
+      transition: color var(--transition);
     }
+    .navbar__dropdown-btn:hover,
+    .navbar__dropdown-btn.is-active {
+      color: var(--lam-gold);
+    }
+    .navbar__dropdown-btn svg { transition: transform .2s; }
+    .navbar__dropdown.is-open .navbar__dropdown-btn svg { transform: rotate(180deg); }
+    .navbar__dropdown-menu {
+      display: none;
+      position: absolute; top: calc(100% + .75rem); left: 50%;
+      transform: translateX(-50%);
+      background: rgba(12,12,12,.98);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(249,149,34,.2);
+      border-radius: var(--radius);
+      min-width: 200px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.6);
+      overflow: hidden;
+      z-index: 200;
+      animation: dropFade .15s ease;
+    }
+    .navbar__dropdown.is-open .navbar__dropdown-menu { display: block; }
+    @keyframes dropFade { from { opacity:0; transform: translateX(-50%) translateY(-6px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+    .navbar__dropdown-item {
+      display: flex; align-items: center; gap: .65rem;
+      padding: .75rem 1.1rem;
+      color: rgba(255,255,255,.8); font-size: .88rem;
+      transition: background var(--transition), color var(--transition);
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .navbar__dropdown-item:last-child { border-bottom: none; }
+    .navbar__dropdown-item:hover { background: rgba(249,149,34,.12); color: var(--lam-gold); }
+    .navbar__dropdown-item-icon {
+      width: 28px; height: 28px;
+      background: rgba(249,149,34,.15);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .navbar__dropdown-item-icon svg { width: 14px; height: 14px; color: var(--lam-gold); }
+    .navbar__dropdown-item-text { line-height: 1.3; }
+    .navbar__dropdown-item-title { font-weight: 600; font-size: .88rem; }
+    .navbar__dropdown-item-desc { font-size: .73rem; color: rgba(255,255,255,.45); }
 
     .navbar__hamburger {
       display: none; flex-direction: column; gap: 5px;
@@ -343,13 +392,28 @@
 
     /* ─── Footer ───────────────────────────────────────────────── */
     .footer {
-      background: var(--lam-brown-d); color: var(--lam-text-m);
+      position: relative;
+      background: var(--lam-black-d); color: var(--lam-text-m);
       border-top: 4px solid var(--lam-gold);
       padding: 3.5rem 0 1.5rem;
+    }
+    .footer::before {
+      content: "";
+      position: absolute;
+      top: -44px; /* Move above the 4px top border (40px height + 4px border = 44px) */
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: url('/images/pucuk-rebung.svg') repeat-x center;
+      background-size: auto 100%;
+      z-index: 10; /* Ensure it overlays the section above */
+      /* transform: rotate(180deg); */
     }
     .footer__grid {
       display: grid; grid-template-columns: 2fr 1fr 1fr;
       gap: 2.5rem; margin-bottom: 2.5rem;
+      position: relative;
+      z-index: 2; /* Ensure content is above the border if they overlap */
     }
     .footer__brand-name {
       font-family: var(--font-head); font-size: 1.1rem;
@@ -535,22 +599,42 @@
       <a href="{{ route('beranda') }}"      class="navbar__link {{ Request::routeIs('beranda')      ? 'is-active' : '' }}">Beranda</a>
       <a href="{{ route('profil') }}"       class="navbar__link {{ Request::routeIs('profil')       ? 'is-active' : '' }}">Profil</a>
       <a href="{{ route('berita.index') }}" class="navbar__link {{ Request::routeIs('berita.*')     ? 'is-active' : '' }}">Berita</a>
+      <a href="{{ route('galeri') }}"       class="navbar__link {{ Request::routeIs('galeri')       ? 'is-active' : '' }}">Galeri</a>
       <a href="{{ route('kontak') }}"       class="navbar__link {{ Request::routeIs('kontak')       ? 'is-active' : '' }}">Kontak</a>
-      
-      @php
-        $urlMuseum = '';
-        if ($setting->meta_keywords) {
-          $decodedMeta = json_decode($setting->meta_keywords, true);
-          $urlMuseum = $decodedMeta['url_museum'] ?? '';
-        }
-      @endphp
 
-      @if($urlMuseum)
-        <a href="{{ $urlMuseum }}" class="navbar__museum-btn" target="_blank" rel="noopener noreferrer"
-           title="Buka Jejak Layar (Museum Digital) — tab baru">
-           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Museum
-        </a>
+      {{-- Dropdown Layanan --}}
+      @if(isset($layanans) && $layanans->count() > 0)
+      <div class="navbar__dropdown" x-data="{ dropOpen: false }" @mouseenter="dropOpen=true" @mouseleave="dropOpen=false" :class="dropOpen ? 'is-open' : ''">
+        <button class="navbar__dropdown-btn" :aria-expanded="dropOpen" aria-haspopup="true">
+          Layanan
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="navbar__dropdown-menu" role="menu">
+          @foreach($layanans as $layanan)
+            @php $isExt = $layanan->url && (str_starts_with($layanan->url,'http://') || str_starts_with($layanan->url,'https://')); @endphp
+            <a href="{{ $layanan->url ?: '#' }}"
+               class="navbar__dropdown-item"
+               role="menuitem"
+               @if($isExt) target="_blank" rel="noopener noreferrer" @endif>
+              <span class="navbar__dropdown-item-icon">
+                @if($layanan->jenis_icon === 'image' && $layanan->image)
+                  <img src="{{ Storage::url($layanan->image) }}" alt="" style="width:24px;height:24px;border-radius:4px;object-fit:cover;">
+                @elseif($layanan->icon)
+                  <x-dynamic-component :component="$layanan->icon" style="width:24px;height:24px;" aria-hidden="true" />
+                @else
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="width:24px;height:24px;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                @endif
+              </span>
+              <span class="navbar__dropdown-item-text">
+                <span class="navbar__dropdown-item-title">{{ $layanan->nama }}</span>
+                @if($layanan->deskripsi)
+                  <span class="navbar__dropdown-item-desc">{{ Str::limit($layanan->deskripsi, 45) }}</span>
+                @endif
+              </span>
+            </a>
+          @endforeach
+        </div>
+      </div>
       @endif
 
       {{-- Theme Toggle (Desktop) --}}
@@ -592,21 +676,21 @@
     <a href="{{ route('beranda') }}"      class="navbar__mobile-link" @click="open=false">Beranda</a>
     <a href="{{ route('profil') }}"       class="navbar__mobile-link" @click="open=false">Profil Lembaga</a>
     <a href="{{ route('berita.index') }}" class="navbar__mobile-link" @click="open=false">Berita</a>
+    <a href="{{ route('galeri') }}"       class="navbar__mobile-link" @click="open=false">Galeri</a>
     <a href="{{ route('kontak') }}"       class="navbar__mobile-link" @click="open=false">Kontak</a>
-    
-    @php
-      $urlMuseum = '';
-      if ($setting->meta_keywords) {
-        $decodedMeta = json_decode($setting->meta_keywords, true);
-        $urlMuseum = $decodedMeta['url_museum'] ?? '';
-      }
-    @endphp
 
-    @if($urlMuseum)
-      <a href="{{ $urlMuseum }}" class="navbar__mobile-museum-btn" target="_blank" rel="noopener noreferrer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Jejak Layar (Museum)
-      </a>
+    {{-- Layanan Mobile --}}
+    @if(isset($layanans) && $layanans->count() > 0)
+      <div style="padding: .5rem 1.5rem .25rem; font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; color:var(--lam-gold); font-weight:700;">Layanan</div>
+      @foreach($layanans as $layanan)
+        @php $isExt = $layanan->url && (str_starts_with($layanan->url,'http://') || str_starts_with($layanan->url,'https://')); @endphp
+        <a href="{{ $layanan->url ?: '#' }}" class="navbar__mobile-link"
+           @click="open=false"
+           @if($isExt) target="_blank" rel="noopener noreferrer" @endif>
+          {{ $layanan->nama }}
+          @if($isExt)<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;margin-left:.25rem;opacity:.5;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>@endif
+        </a>
+      @endforeach
     @endif
     
     {{-- Theme Toggle (Mobile) --}}

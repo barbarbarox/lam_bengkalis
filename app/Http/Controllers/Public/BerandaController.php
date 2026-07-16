@@ -7,6 +7,7 @@ use App\Models\BackgroundSlide;
 use App\Models\BannerIklan;
 use App\Models\Berita;
 use App\Models\BeritaKategori;
+use App\Models\Layanan;
 use App\Models\SambutanBph;
 use App\Models\SiteSetting;
 
@@ -22,6 +23,9 @@ class BerandaController extends Controller
 
         $sambutan = SambutanBph::aktif()->first();
 
+        // Layanan aktif untuk section beranda dan navbar dropdown
+        $layanans = Layanan::aktif()->terurut()->get();
+
         // Berita terbaru — 6 artikel
         $beritaTerbaru = Berita::published()
             ->terbaru()
@@ -35,7 +39,8 @@ class BerandaController extends Controller
         ])->get();
 
         return view('public.beranda.index', compact(
-            'setting', 'slides', 'banners', 'sambutan', 'beritaTerbaru', 'kategori'
+            'setting', 'slides', 'banners', 'sambutan', 'layanans', 'beritaTerbaru', 'kategori'
         ));
     }
 }
+

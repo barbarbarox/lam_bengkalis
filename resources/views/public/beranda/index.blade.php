@@ -33,19 +33,24 @@
 
   {{-- Konten tengah hero --}}
   <div class="container" style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding-top:4rem;">
-    <div style="background:rgba(212, 160, 23, 0.85); backdrop-filter: blur(4px); padding: 3rem; border-radius: var(--radius); box-shadow: var(--lam-shadow); max-width: 800px;">
-      <p style="font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:var(--lam-black-d);font-weight:700;margin-bottom:1rem;">
+    <div class="hero-box" style="position: relative; overflow: hidden; background: rgba(212, 160, 23, 0.75); backdrop-filter: blur(10px); padding: 4rem 3rem; border-radius: var(--radius); box-shadow: var(--lam-shadow); max-width: 800px;">
+      
+      {{-- SVG Borders --}}
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 32px; background: url('{{ asset('images/itik_pulang_petang.svg') }}') repeat-x center; background-size: auto 100%; opacity: 0.8;" aria-hidden="true"></div>
+      <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 32px; background: url('{{ asset('images/itik_pulang_petang.svg') }}') repeat-x center; background-size: auto 100%; opacity: 0.8; transform: rotate(180deg);" aria-hidden="true"></div>
+      
+      <p style="font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:var(--lam-black-d);font-weight:700;margin-bottom:1rem;position:relative;z-index:2;">
         Lembaga Resmi Pemerintah Daerah
       </p>
-      <h1 style="font-family:var(--font-head);font-size:clamp(2rem,5vw,3.5rem);color:var(--lam-black);font-weight:700;max-width:700px;line-height:1.2;margin-bottom:1.25rem;text-shadow:none;">
+      <h1 style="font-family:var(--font-head);font-size:clamp(2rem,5vw,3.5rem);color:var(--lam-black);font-weight:700;max-width:700px;line-height:1.2;margin-bottom:1.25rem;text-shadow:none;position:relative;z-index:2;">
         {{ $setting->nama_lembaga ?? 'Lembaga Adat Melayu Kabupaten Bengkalis' }}
       </h1>
-      <p style="color:var(--lam-black-l);max-width:540px;font-size:1.05rem;margin-bottom:2rem;margin-left:auto;margin-right:auto;font-weight:500;">
+      <p style="color:var(--lam-black-l);max-width:540px;font-size:1.05rem;margin-bottom:2rem;margin-left:auto;margin-right:auto;font-weight:500;position:relative;z-index:2;">
         {{ $setting->meta_deskripsi ?? 'Menjaga, melestarikan, dan mengembangkan adat budaya Melayu di Kabupaten Bengkalis.' }}
       </p>
-      <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
-        <a href="{{ route('profil') }}" class="btn" style="background:var(--lam-black);color:var(--lam-gold);">Profil Lembaga</a>
-        <a href="{{ route('berita.index') }}" class="btn" style="background:transparent;border:2px solid var(--lam-black);color:var(--lam-black);">Baca Berita</a>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;position:relative;z-index:2;">
+        <a href="{{ route('profil') }}" class="btn hero-btn-primary" style="background:var(--lam-gold); color:var(--lam-black); border:2px solid var(--lam-gold); font-weight:700; transition:all 0.3s ease;">Profil Lembaga</a>
+        <a href="{{ route('berita.index') }}" class="btn hero-btn-outline" style="background:transparent; border:2px solid rgba(255,255,255,0.7); color:#fff; font-weight:600; transition:all 0.3s ease;">Baca Berita</a>
       </div>
     </div>
   </div>
@@ -77,7 +82,180 @@
   @media (prefers-reduced-motion:reduce){
     [x-data*="backgroundCarousel"] div[style*="transition"] { transition:none !important; }
   }
+  .hero-btn-primary:hover {
+    background: #e5871b !important; /* Slightly darker gold/yellow */
+    border-color: #e5871b !important;
+    transform: translateY(-2px);
+  }
+  .hero-btn-outline:hover {
+    background: rgba(255,255,255,0.15) !important;
+    border-color: #fff !important;
+    transform: translateY(-2px);
+  }
 </style>
+
+{{-- ══════════════════════════════════════════════════════════════
+     LAYANAN
+════════════════════════════════════════════════════════════════ --}}
+@if(isset($layanans) && $layanans->count() > 0)
+<section id="layanan" style="background:var(--lam-black); padding:3rem 0 4rem;">
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-heading__eyebrow">Apa yang Kami Tawarkan</span>
+      <h2 class="section-heading__title">Layanan & Kategori</h2>
+      <div class="section-heading__divider"><span></span><i></i><span></span></div>
+    </div>
+
+    <div class="layanan-container">
+      <div class="layanan-scroll-wrapper">
+        @foreach($layanans as $idx => $layanan)
+          @php
+            $warna = $layanan->warna ?: '#F99522';
+            $accents = ['#F99522', '#008000', '#EB2D3A', '#FFC90E', '#009900'];
+            $accent = $warna !== '#F99522' ? $warna : ($accents[$idx % count($accents)] ?? '#F99522');
+            $isExt = $layanan->url && (str_starts_with($layanan->url,'http://') || str_starts_with($layanan->url,'https://'));
+          @endphp
+          
+          <a href="{{ $layanan->url ?? '#' }}" 
+             class="layanan-box" 
+             style="--accent: {{ $accent }};"
+             @if($isExt) target="_blank" rel="noopener noreferrer" @endif>
+            
+            <div class="layanan-box__icon-wrapper">
+              @if($layanan->jenis_icon === 'image' && $layanan->image)
+                <img src="{{ Storage::url($layanan->image) }}" alt="{{ $layanan->nama }}" class="layanan-box__img" loading="lazy">
+              @elseif($layanan->icon)
+                <x-dynamic-component :component="$layanan->icon" class="layanan-box__icon-svg" aria-hidden="true" />
+              @else
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="layanan-box__icon-svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              @endif
+            </div>
+            
+            <span class="layanan-box__title">{{ $layanan->nama }}</span>
+          </a>
+        @endforeach
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .layanan-container {
+    width: 100%;
+    overflow: hidden;
+    /* Optional: fade effect on edges */
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+  
+  .layanan-scroll-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1.5rem;
+    padding: 1rem 10%;
+    /* Hide scrollbar */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    align-items: flex-start;
+  }
+  .layanan-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .layanan-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    min-width: 90px;
+    max-width: 110px;
+    transition: transform 0.2s ease;
+  }
+  
+  .layanan-box:hover {
+    transform: translateY(-4px);
+  }
+  
+  .layanan-box__icon-wrapper {
+    width: 64px;
+    height: 64px;
+    background: var(--lam-black-l);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .layanan-box:hover .layanan-box__icon-wrapper {
+    background: color-mix(in srgb, var(--accent) 15%, var(--lam-black-l));
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px var(--accent) inset;
+  }
+  
+  .layanan-box__icon-svg {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .layanan-box__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .layanan-box__title {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #F5F5F5;
+    text-align: center;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.3s ease;
+  }
+  
+  .layanan-box:hover .layanan-box__title {
+    color: var(--accent);
+  }
+  
+  @media (max-width: 768px) {
+    .layanan-scroll-wrapper {
+      padding: 1rem 5%;
+      gap: 1rem;
+    }
+    .layanan-box {
+      min-width: 80px;
+    }
+    .layanan-box__icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+    }
+    .layanan-box__icon-svg {
+      width: 28px;
+      height: 28px;
+    }
+    .layanan-box__title {
+      font-size: 0.75rem;
+    }
+  }
+</style>
+@endif
+
+
 
 {{-- ══════════════════════════════════════════════════════════════
      SAMBUTAN BPH

@@ -117,3 +117,4 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(fn () => asset('images/favicon.ico'));
     }
 }
+

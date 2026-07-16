@@ -64,6 +64,10 @@ class SiteSetting extends Model
         'tahun_berdiri',
         'embed_peta',
         'url_museum',
+        'hero_profil_path',
+        'hero_berita_path',
+        'hero_kontak_path',
+        'hero_galeri_path',
     ];
 
     // ── Singleton Pattern ─────────────────────────────────────────────────────
@@ -116,5 +120,21 @@ class SiteSetting extends Model
             return $decoded['url_museum'] ?? null;
         }
         return null;
+    }
+
+    /**
+     * Helper: URL publik gambar hero untuk halaman tertentu.
+     * Mengembalikan null jika belum diset.
+     */
+    public function heroUrl(string $halaman): ?string
+    {
+        $col = match($halaman) {
+            'profil' => $this->hero_profil_path,
+            'berita' => $this->hero_berita_path,
+            'kontak' => $this->hero_kontak_path,
+            'galeri' => $this->hero_galeri_path,
+            default  => null,
+        };
+        return $col ? \Illuminate\Support\Facades\Storage::url($col) : null;
     }
 }

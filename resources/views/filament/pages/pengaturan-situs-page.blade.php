@@ -44,4 +44,21 @@
             </x-filament::button>
         </div>
     </x-filament::section>
+
+    <div class="mt-6"></div>
+
+    {{-- Background Hero Per Halaman --}}
+    <x-filament::section>
+        <x-slot name="heading">Background Hero Per Halaman</x-slot>
+        <x-slot name="description">Gambar latar untuk header halaman Profil, Berita, dan Kontak — dengan gradasi emas di tepi.</x-slot>
+
+        {{ $this->heroForm }}
+
+        <div class="mt-4 flex justify-end">
+            <x-filament::button wire:click="saveHero" icon="heroicon-o-check" color="primary">
+                Simpan Hero Background
+            </x-filament::button>
+        </div>
+    </x-filament::section>
 </x-filament-panels::page>
+

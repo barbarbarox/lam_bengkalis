@@ -41,6 +41,12 @@ class PengaturanSitusPage extends Page implements HasForms
     // URL eksternal khusus
     public ?string $url_museum = null;  // disimpan di meta_keywords JSON sementara
 
+    // Hero backgrounds per halaman
+    public $hero_profil_path = null;
+    public $hero_berita_path = null;
+    public $hero_kontak_path = null;
+    public $hero_galeri_path = null;
+
     public function mount(): void
     {
         $setting = SiteSetting::instance();
@@ -74,6 +80,14 @@ class PengaturanSitusPage extends Page implements HasForms
             ];
             $this->url_museum = '';
         }
+
+        // Hero backgrounds
+        $this->heroForm->fill([
+            'hero_profil_path' => $setting->hero_profil_path,
+            'hero_berita_path' => $setting->hero_berita_path,
+            'hero_kontak_path' => $setting->hero_kontak_path,
+            'hero_galeri_path' => $setting->hero_galeri_path,
+        ]);
     }
 
     // ── Forms ─────────────────────────────────────────────────────────────────
@@ -190,10 +204,58 @@ class PengaturanSitusPage extends Page implements HasForms
         ])->statePath('');
     }
 
+    public function heroForm(Form $form): Form
+    {
+        return $form->schema([
+            Section::make('Background Hero Per Halaman')
+                ->icon('heroicon-o-photo')
+                ->description('Gambar latar untuk kotak header di halaman Profil, Berita, dan Kontak. Ditampilkan dengan gradasi emas di tepi.')
+                ->schema([
+                    FileUpload::make('hero_profil_path')
+                        ->label('Hero — Halaman Profil')
+                        ->image()
+                        ->disk('public')
+                        ->directory('hero')
+                        ->imagePreviewHeight('120')
+                        ->maxSize(5120)
+                        ->helperText('JPG/PNG/WebP. Rekomendasi min 1600×500px. Maks 5 MB.'),
+
+                    FileUpload::make('hero_berita_path')
+                        ->label('Hero — Halaman Berita')
+                        ->image()
+                        ->disk('public')
+                        ->directory('hero')
+                        ->imagePreviewHeight('120')
+                        ->maxSize(5120)
+                        ->helperText('JPG/PNG/WebP. Rekomendasi min 1600×500px. Maks 5 MB.'),
+
+                    FileUpload::make('hero_kontak_path')
+                        ->label('Hero — Halaman Kontak')
+                        ->image()
+                        ->disk('public')
+                        ->directory('hero')
+                        ->imagePreviewHeight('120')
+                        ->maxSize(5120)
+                        ->helperText('JPG/PNG/WebP. Rekomendasi min 1600×500px. Maks 5 MB.'),
+
+                    FileUpload::make('hero_galeri_path')
+                        ->label('Hero — Halaman Galeri')
+                        ->image()
+                        ->disk('public')
+                        ->directory('hero')
+                        ->imagePreviewHeight('120')
+                        ->maxSize(5120)
+                        ->helperText('JPG/PNG/WebP. Rekomendasi min 1600×500px. Maks 5 MB.'),
+                ])
+                ->columns(1),
+        ])->statePath('');
+    }
+
     protected function getForms(): array
     {
-        return ['identitasForm', 'seoForm', 'sosialMediaForm'];
+        return ['identitasForm', 'seoForm', 'sosialMediaForm', 'heroForm'];
     }
+
 
     // ── Save Actions ──────────────────────────────────────────────────────────
 
@@ -254,6 +316,23 @@ class PengaturanSitusPage extends Page implements HasForms
 
         Notification::make()
             ->title('Media sosial berhasil disimpan')
+            ->icon('heroicon-o-check-circle')
+            ->success()
+            ->send();
+    }
+
+    public function saveHero(): void
+    {
+        $data = $this->heroForm->getState();
+        SiteSetting::updateSettings([
+            'hero_profil_path' => $data['hero_profil_path'],
+            'hero_berita_path' => $data['hero_berita_path'],
+            'hero_kontak_path' => $data['hero_kontak_path'],
+            'hero_galeri_path' => $data['hero_galeri_path'],
+        ]);
+
+        Notification::make()
+            ->title('Background hero berhasil disimpan')
             ->icon('heroicon-o-check-circle')
             ->success()
             ->send();

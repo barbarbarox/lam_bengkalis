@@ -5,12 +5,22 @@
 @section('content')
 
 {{-- Page Header --}}
-<div style="background:var(--lam-green);padding:4rem 0 3rem;text-align:center;">
-  <div class="container">
+@php $heroBg = $setting->heroUrl('berita'); @endphp
+<div class="page-hero" style="{{ $heroBg ? 'background-image:url('.$heroBg.')' : '' }}">
+  <div class="page-hero__overlay"></div>
+  @if($heroBg)<div class="page-hero__gold-edge"></div>@endif
+  <div class="container" style="position:relative;z-index:2;text-align:center;">
     <p style="font-size:.75rem;letter-spacing:.25em;text-transform:uppercase;color:var(--lam-gold);font-weight:600;margin-bottom:.75rem;">Informasi Terkini</p>
     <h1 style="font-family:var(--font-head);font-size:clamp(1.75rem,4vw,2.75rem);color:white;">Berita &amp; Pengumuman</h1>
   </div>
 </div>
+<style>
+  .page-hero{position:relative;padding:5rem 0 4rem;text-align:center;background-color:var(--lam-black);background-size:cover;background-position:center;background-repeat:no-repeat;}
+  .page-hero__overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,rgba(0,0,0,.4) 60%,rgba(0,0,0,.7) 100%);z-index:1;}
+  .page-hero__gold-edge{position:absolute;inset:0;background:linear-gradient(to right,rgba(249,149,34,.35) 0%,transparent 18%,transparent 82%,rgba(249,149,34,.35) 100%),linear-gradient(to bottom,rgba(249,149,34,.2) 0%,transparent 30%);z-index:1;pointer-events:none;}
+</style>
+
+
 
 {{-- Filter + Search --}}
 <div style="background:var(--lam-bg-alt);border-bottom:1px solid var(--lam-border);padding:1rem 0;">
