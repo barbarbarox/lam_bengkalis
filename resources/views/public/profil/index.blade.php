@@ -48,25 +48,39 @@
 <div x-data="profileScrollspy()" @scroll.window="onScroll" style="position:relative;">
 
   {{-- Tab Navigation --}}
-  <div style="background:var(--lam-green);position:sticky;top:64px;z-index:50;box-shadow:0 4px 15px rgba(0,0,0,0.1);">
-    <div class="container" style="overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;">
-      <div class="radio-inputs">
-        @foreach([
-          ['id'=>'sejarah',      'label'=>'Sejarah'],
-          ['id'=>'visi-misi',    'label'=>'Visi & Misi'],
-          ['id'=>'tugas-fungsi', 'label'=>'Tugas & Fungsi'],
-          ['id'=>'dasar-hukum',  'label'=>'Dasar Hukum'],
-          ['id'=>'struktur',     'label'=>'Struktur Organisasi'],
-        ] as $tab)
-          <label class="radio" :class="activeTab === '{{ $tab['id'] }}' ? 'is-active' : ''">
-            <span class="name" @click.prevent="scrollTo('{{ $tab['id'] }}')">
-              <span class="pre-name"></span>
-              <span class="pos-name"></span>
-              <span style="white-space:nowrap;">{{ $tab['label'] }}</span>
-            </span>
-          </label>
-        @endforeach
+  <div style="background:var(--lam-green);position:sticky;top:64px;z-index:50;box-shadow:0 4px 15px rgba(0,0,0,0.1);" x-init="init()">
+    <div class="container" style="position:relative; padding:0;">
+      
+      <!-- Left Arrow -->
+      <button class="nav-arrow left-arrow" x-show="canScrollLeft" @click="scrollNav('left')" style="display:none;" x-transition.opacity>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+
+      <div class="nav-scroll-container" x-ref="navContainer" @scroll.passive="checkNavScroll" style="overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;">
+        <div class="radio-inputs">
+          @foreach([
+            ['id'=>'sejarah',      'label'=>'Sejarah'],
+            ['id'=>'visi-misi',    'label'=>'Visi & Misi'],
+            ['id'=>'tugas-fungsi', 'label'=>'Tugas & Fungsi'],
+            ['id'=>'dasar-hukum',  'label'=>'Dasar Hukum'],
+            ['id'=>'struktur',     'label'=>'Struktur Organisasi'],
+          ] as $tab)
+            <label class="radio" :class="activeTab === '{{ $tab['id'] }}' ? 'is-active' : ''">
+              <span class="name" @click.prevent="scrollTo('{{ $tab['id'] }}')">
+                <span class="pre-name"></span>
+                <span class="pos-name"></span>
+                <span style="white-space:nowrap;">{{ $tab['label'] }}</span>
+              </span>
+            </label>
+          @endforeach
+        </div>
       </div>
+
+      <!-- Right Arrow -->
+      <button class="nav-arrow right-arrow" x-show="canScrollRight" @click="scrollNav('right')" style="display:none;" x-transition.opacity>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
     </div>
   </div>
 
@@ -172,18 +186,27 @@
       @endphp
 
       <style>
+        .org-chart-wrapper {
+          width: 100%;
+          overflow-x: auto;
+          -ms-overflow-style: none;
+          scrollbar-width: thin;
+          padding-bottom: 1rem;
+        }
         .org-chart {
           display: flex;
           flex-direction: column;
           align-items: center;
           padding-top: 1rem;
+          min-width: max-content; /* Ensure it takes full width of its children */
         }
         .org-group {
           display: flex;
-          flex-wrap: wrap;
+          flex-wrap: nowrap; /* Prevent wrapping so lines stay intact */
           justify-content: center;
           position: relative;
-          width: 100%;
+          width: max-content;
+          gap: 1rem; /* Adjust gap if needed, though card-wrapper has padding */
         }
         .org-group + .org-group {
           margin-top: 3.5rem;
@@ -202,7 +225,6 @@
         .org-card-wrapper {
           position: relative;
           padding: 2rem 1rem 0;
-          margin-bottom: 1rem;
         }
         .org-group:first-child .org-card-wrapper {
           padding-top: 0;
@@ -241,7 +263,7 @@
         }
         
         .org-card {
-          width: 200px;
+          width: 180px; /* Slightly narrower to fit better on mobile screens */
           text-align: center;
           background: var(--lam-bg-alt);
           border-radius: var(--radius);
@@ -263,76 +285,133 @@
           margin: 0 auto 1rem; border: 3px solid var(--card-color, var(--lam-gold));
           display: flex; align-items: center; justify-content: center;
         }
+
+        .scroll-hint {
+          display: none;
+        }
         
         @media (max-width: 768px) {
-          .org-group + .org-group::before,
-          .org-card-wrapper::before,
-          .org-card-wrapper::after {
-            display: none !important;
+          .org-card {
+             width: clamp(70px, calc((100vw - 2rem) / var(--count) - 0.5rem), 140px);
+             padding: 0.5rem 0.2rem;
           }
-          .org-card-wrapper {
-            padding-top: 0 !important;
+          .org-card__img, .org-card__placeholder {
+             width: clamp(35px, calc(50vw / var(--count)), 55px);
+             height: clamp(35px, calc(50vw / var(--count)), 55px);
+             margin-bottom: 0.4rem;
+             border-width: 2px;
           }
-          .org-group + .org-group {
-            margin-top: 1rem;
+          .org-card-name {
+             font-size: clamp(0.65rem, calc(7vw / var(--count)), 0.9rem) !important;
           }
+          .org-card-title {
+             font-size: clamp(0.55rem, calc(5.5vw / var(--count)), 0.75rem) !important;
+          }
+          .scroll-hint {
+             display: flex !important;
+             align-items: center;
+             justify-content: center;
+             gap: 0.5rem;
+             font-size: 0.75rem;
+             color: var(--lam-gold);
+             background: rgba(249, 149, 34, 0.1);
+             padding: 0.4rem 1rem;
+             border-radius: 20px;
+             margin: 0 auto 1.5rem;
+             width: fit-content;
+          }
+          .scroll-hint svg {
+             animation: slide-hint 1.5s ease-in-out infinite;
+          }
+          @keyframes slide-hint {
+             0%, 100% { transform: translateX(-3px); }
+             50% { transform: translateX(3px); }
+          }
+          /* Hierarchy lines are no longer hidden! */
         }
       </style>
 
+      @php
+        $hasManyMka = false;
+        foreach($groupedMka as $anggotas) {
+            if(count($anggotas) > 4) { $hasManyMka = true; break; }
+        }
+        $hasManyDph = false;
+        foreach($groupedDph as $anggotas) {
+            if(count($anggotas) > 4) { $hasManyDph = true; break; }
+        }
+      @endphp
+
       @if($strukturMka->count() > 0)
         <div style="margin-bottom:5rem;">
-          <h3 style="font-family:var(--font-head);color:var(--lam-green);text-align:center;margin-bottom:2.5rem;font-size:1.6rem;">
+          <h3 style="font-family:var(--font-head);color:var(--lam-green);text-align:center;margin-bottom:1.5rem;font-size:1.6rem;">
             Majelis Kerapatan Adat (MKA)
           </h3>
-          <div class="org-chart" style="--card-color: var(--lam-gold);">
-            @foreach($groupedMka as $urutan => $anggotas)
-              <div class="org-group">
-                @foreach($anggotas as $anggota)
-                  <div class="org-card-wrapper">
-                    <div class="org-card">
-                    @if($anggota->foto)
-                      <img src="{{ Storage::url($anggota->foto) }}" alt="{{ $anggota->nama }}" class="org-card__img" loading="lazy">
-                    @else
-                      <div class="org-card__placeholder" aria-hidden="true">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="var(--lam-green)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          @if($hasManyMka)
+          <div class="scroll-hint">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3"/><path d="M16 9l4 3-4 3"/><path d="M4 12h16"/></svg>
+            <span>Geser untuk melihat bagian tepi</span>
+          </div>
+          @endif
+          <div class="org-chart-wrapper">
+            <div class="org-chart" style="--card-color: var(--lam-gold);">
+              @foreach($groupedMka as $urutan => $anggotas)
+                <div class="org-group" style="--count: {{ count($anggotas) }};">
+                  @foreach($anggotas as $anggota)
+                    <div class="org-card-wrapper">
+                      <div class="org-card">
+                      @if($anggota->foto)
+                        <img src="{{ Storage::url($anggota->foto) }}" alt="{{ $anggota->nama }}" class="org-card__img" loading="lazy">
+                      @else
+                        <div class="org-card__placeholder" aria-hidden="true">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="var(--lam-green)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                      @endif
+                      <p class="org-card-name" style="font-weight:700;color:var(--lam-text);font-size:.95rem;margin-bottom:.25rem;line-height:1.2;">{{ $anggota->nama }}</p>
+                      <p class="org-card-title" style="font-size:.8rem;color:var(--lam-green);font-weight:600;line-height:1.2;">{{ $anggota->jabatan }}</p>
                       </div>
-                    @endif
-                    <p style="font-weight:700;color:var(--lam-text);font-size:.95rem;margin-bottom:.25rem;">{{ $anggota->nama }}</p>
-                    <p style="font-size:.8rem;color:var(--lam-green);font-weight:600;">{{ $anggota->jabatan }}</p>
                     </div>
-                  </div>
-                @endforeach
-              </div>
-            @endforeach
+                  @endforeach
+                </div>
+              @endforeach
+            </div>
           </div>
         </div>
       @endif
 
       @if($strukturDph->count() > 0)
         <div>
-          <h3 style="font-family:var(--font-head);color:var(--lam-green);text-align:center;margin-bottom:2.5rem;font-size:1.6rem;">
+          <h3 style="font-family:var(--font-head);color:var(--lam-green);text-align:center;margin-bottom:1.5rem;font-size:1.6rem;">
             Dewan Pengurus Harian (DPH)
           </h3>
-          <div class="org-chart" style="--card-color: var(--lam-maroon);">
-            @foreach($groupedDph as $urutan => $anggotas)
-              <div class="org-group">
-                @foreach($anggotas as $anggota)
-                  <div class="org-card-wrapper">
-                    <div class="org-card">
-                    @if($anggota->foto)
-                      <img src="{{ Storage::url($anggota->foto) }}" alt="{{ $anggota->nama }}" class="org-card__img" loading="lazy">
-                    @else
-                      <div class="org-card__placeholder" aria-hidden="true">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="var(--lam-maroon)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          @if($hasManyDph)
+          <div class="scroll-hint">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3"/><path d="M16 9l4 3-4 3"/><path d="M4 12h16"/></svg>
+            <span>Geser untuk melihat bagian tepi</span>
+          </div>
+          @endif
+          <div class="org-chart-wrapper">
+            <div class="org-chart" style="--card-color: var(--lam-maroon);">
+              @foreach($groupedDph as $urutan => $anggotas)
+                <div class="org-group" style="--count: {{ count($anggotas) }};">
+                  @foreach($anggotas as $anggota)
+                    <div class="org-card-wrapper">
+                      <div class="org-card">
+                      @if($anggota->foto)
+                        <img src="{{ Storage::url($anggota->foto) }}" alt="{{ $anggota->nama }}" class="org-card__img" loading="lazy">
+                      @else
+                        <div class="org-card__placeholder" aria-hidden="true">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="var(--lam-maroon)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                      @endif
+                      <p class="org-card-name" style="font-weight:700;color:var(--lam-text);font-size:.95rem;margin-bottom:.25rem;line-height:1.2;">{{ $anggota->nama }}</p>
+                      <p class="org-card-title" style="font-size:.8rem;color:var(--lam-maroon);font-weight:600;line-height:1.2;">{{ $anggota->jabatan }}</p>
                       </div>
-                    @endif
-                    <p style="font-weight:700;color:var(--lam-text);font-size:.95rem;margin-bottom:.25rem;">{{ $anggota->nama }}</p>
-                    <p style="font-size:.8rem;color:var(--lam-maroon);font-weight:600;">{{ $anggota->jabatan }}</p>
                     </div>
-                  </div>
-                @endforeach
-              </div>
-            @endforeach
+                  @endforeach
+                </div>
+              @endforeach
+            </div>
           </div>
         </div>
       @endif
@@ -355,16 +434,43 @@
   .prose-konten a { color: var(--lam-green); text-decoration: underline; }
 
   /* Uiverse Tabs adapted for scroll navigation */
+  .nav-scroll-container::-webkit-scrollbar { display: none; }
+  .nav-arrow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    background: transparent;
+    color: var(--lam-cream);
+    border: none;
+    z-index: 10;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .left-arrow { left: 0; background: linear-gradient(to right, var(--lam-green) 50%, transparent); }
+  .right-arrow { right: 0; background: linear-gradient(to left, var(--lam-green) 50%, transparent); }
+  
+  @media (min-width: 769px) {
+    .nav-arrow { display: none !important; }
+  }
+
   .radio-inputs {
     position: relative;
     display: flex;
+    flex-wrap: nowrap;
     background-color: var(--lam-green);
     font-size: 14px;
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
     padding: 0.5rem 1.5rem 0 1.5rem;
     justify-content: center;
   }
-  .radio-inputs .radio { margin: 0; }
+  .radio-inputs .radio { 
+    margin: 0; 
+    flex: 0 0 auto; /* Prevent tabs from shrinking */
+  }
   .radio-inputs .radio .name {
     display: flex;
     cursor: pointer;
@@ -496,10 +602,38 @@
     margin-bottom: 1.25rem;
   }
   @media screen and (max-width: 768px) {
-    .timeline-container::after { left: 24px; }
-    .timeline-item { width: 100%; padding-left: 70px; padding-right: 0px; }
-    .timeline-right { left: 0; }
-    .timeline-left::after, .timeline-right::after { left: 12px; }
+    /* Tetap selang-seling: shrink padding and content */
+    .timeline-item { 
+      padding: 10px 10px; 
+    }
+    .timeline-item::after {
+      width: 16px;
+      height: 16px;
+      right: -8px;
+      top: 15px;
+      border-width: 3px;
+    }
+    .timeline-right::after { 
+      left: -8px; 
+    }
+    .timeline-content {
+      padding: 0.75rem;
+    }
+    .timeline-content h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .timeline-img {
+      max-height: 120px;
+      margin-bottom: 0.75rem;
+    }
+    .timeline-content .prose-konten {
+      font-size: 0.85rem;
+    }
+    .timeline-content .prose-konten p,
+    .timeline-content .prose-konten li {
+      text-align: left; /* Menghindari spasi berantakan akibat justify di kolom sempit */
+    }
     .radio-inputs { justify-content: flex-start; padding: 0.5rem 1rem 0; }
   }
 </style>
@@ -513,6 +647,34 @@
       activeTab: 'sejarah',
       isScrolling: false,
       sections: ['sejarah', 'visi-misi', 'tugas-fungsi', 'dasar-hukum', 'struktur'],
+      canScrollLeft: false,
+      canScrollRight: false,
+      
+      init() {
+        setTimeout(() => this.checkNavScroll(), 200);
+        window.addEventListener('resize', () => this.checkNavScroll());
+      },
+      checkNavScroll() {
+        const el = this.$refs.navContainer;
+        if (el) {
+          // Hanya tampilkan panah pada mobile (width < 769px)
+          if (window.innerWidth <= 768) {
+            this.canScrollLeft = el.scrollLeft > 5;
+            this.canScrollRight = el.scrollLeft < (el.scrollWidth - el.clientWidth - 5);
+          } else {
+            this.canScrollLeft = false;
+            this.canScrollRight = false;
+          }
+        }
+      },
+      scrollNav(dir) {
+        const el = this.$refs.navContainer;
+        if (el) {
+          const scrollAmount = 180;
+          el.scrollBy({ left: dir === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+          setTimeout(() => this.checkNavScroll(), 400); // Check again after animation
+        }
+      },
       
       scrollTo(id) {
         this.activeTab = id;
