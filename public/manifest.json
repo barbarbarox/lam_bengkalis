@@ -1,0 +1,28 @@
+{
+  "name": "LAM Bengkalis",
+  "short_name": "LAM Bengkalis",
+  "description": "Lembaga Adat Melayu Riau Kabupaten Bengkalis",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070707",
+  "theme_color": "#070707",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

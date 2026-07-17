@@ -11,6 +11,11 @@
   <title>@yield('title', config('app.name', 'LAM Bengkalis'))</title>
   <meta name="description" content="@yield('meta_description', $setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Kabupaten Bengkalis.')">
 
+  {{-- PWA Setup --}}
+  <link rel="manifest" href="{{ asset('manifest.json') }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/icon-192x192.png') }}">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   {{-- Google Fonts --}}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -812,6 +817,75 @@
     </div>
   </div>
 </footer>
+
+{{-- ── PWA Install Prompt & Script ────────────────────────────────────────────────── --}}
+<div id="pwa-install-banner" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--lam-black-d); color: #fff; padding: 1rem 1.5rem; z-index: 9999; border-top: 2px solid var(--lam-gold); box-shadow: 0 -5px 20px rgba(0,0,0,0.5); justify-content: space-between; align-items: center;">
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <img src="{{ asset('images/icon-192x192.png') }}" alt="Icon" style="width: 48px; height: 48px; border-radius: 12px;">
+    <div>
+      <div style="font-weight: bold; font-family: var(--font-head); font-size: 1.1rem; color: var(--lam-gold);">LAM Bengkalis</div>
+      <div style="font-size: 0.8rem; color: #ccc;">Install aplikasi untuk akses lebih cepat dan mudah</div>
+    </div>
+  </div>
+  <div style="display: flex; gap: 0.75rem; align-items: center;">
+    <button id="pwa-close-btn" style="background: none; border: none; color: #aaa; font-size: 0.9rem; cursor: pointer; padding: 0.5rem;">Nanti</button>
+    <button id="pwa-install-btn" style="background: var(--lam-gold); color: var(--lam-black); border: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold; font-size: 0.9rem; cursor: pointer;">Install</button>
+  </div>
+</div>
+
+<script>
+  // 1. Register Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(err => {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    });
+  }
+
+  // 2. Custom Install Prompt Logic
+  let deferredPrompt;
+  const pwaBanner = document.getElementById('pwa-install-banner');
+  const installBtn = document.getElementById('pwa-install-btn');
+  const closeBtn = document.getElementById('pwa-close-btn');
+
+  // Cek apakah user pernah menolak install sebelumnya
+  const hasDeclined = localStorage.getItem('lam_pwa_declined');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent browser's default prompt
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Show banner only if user hasn't declined recently and isn't already installed
+    if (!hasDeclined && !window.matchMedia('(display-mode: standalone)').matches) {
+      pwaBanner.style.display = 'flex';
+    }
+  });
+
+  installBtn.addEventListener('click', async () => {
+    pwaBanner.style.display = 'none';
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('User accepted the PWA prompt');
+      }
+      deferredPrompt = null;
+    }
+  });
+
+  closeBtn.addEventListener('click', () => {
+    pwaBanner.style.display = 'none';
+    // Simpan penolakan agar tidak mengganggu setiap saat
+    localStorage.setItem('lam_pwa_declined', 'true');
+  });
+
+  window.addEventListener('appinstalled', () => {
+    pwaBanner.style.display = 'none';
+    deferredPrompt = null;
+  });
+</script>
 
 @stack('body_scripts')
 </body>

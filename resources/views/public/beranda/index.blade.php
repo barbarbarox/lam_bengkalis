@@ -261,51 +261,86 @@
      SAMBUTAN BPH
 ════════════════════════════════════════════════════════════════ --}}
 @if($sambutan)
-<section id="sambutan" class="section-pad" style="background:var(--lam-bg-alt);">
-  <div class="container">
-    <div style="display:grid;grid-template-columns:1fr 2fr;gap:3rem;align-items:center;" class="sambutan-grid">
-      {{-- Foto --}}
-      <div style="text-align:center;">
-        @if($sambutan->foto)
-          <img src="{{ Storage::url($sambutan->foto) }}"
-               alt="Foto {{ $sambutan->nama_ketua }}"
-               style="width:220px;height:260px;object-fit:cover;border-radius:var(--radius);
-                      box-shadow:0 12px 40px rgba(11,79,48,.2);border:4px solid var(--lam-gold);
-                      margin:0 auto;">
-        @else
-          <div style="width:220px;height:260px;background:var(--lam-cream);border-radius:var(--radius);
-                      display:flex;align-items:center;justify-content:center;margin:0 auto;border:4px solid var(--lam-gold);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" stroke="var(--lam-green)" stroke-width="1" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-        @endif
-        <p style="margin-top:1rem;font-weight:700;color:var(--lam-green);font-size:.95rem;">{{ $sambutan->nama_ketua }}</p>
-        <p style="font-size:.8rem;color:var(--lam-text-l);">{{ $sambutan->jabatan }}</p>
-        @if($sambutan->periode_mulai)
-          <p style="font-size:.75rem;color:var(--lam-gold);font-weight:600;">Periode {{ $sambutan->periodeLabel() }}</p>
-        @endif
-      </div>
-      {{-- Isi Sambutan --}}
-      <div>
-        <div class="section-heading" style="text-align:left;margin-bottom:1.5rem;">
-          <span class="section-heading__eyebrow">Sambutan</span>
-          <h2 class="section-heading__title">Kata Sambutan Dewan Pimpinan Harian</h2>
-          <div class="section-heading__divider" style="justify-content:flex-start;">
-            <span></span><i></i><span></span>
-          </div>
+<section id="sambutan" class="section-pad" style="background:var(--lam-bg-alt); border-top: 3px solid var(--lam-gold); border-bottom: 3px solid var(--lam-gold);">
+  <div class="container" style="position:relative;">
+
+    {{-- Corak Vertikal Kiri --}}
+    <div class="sambutan-corak sambutan-corak--left" aria-hidden="true"></div>
+
+    {{-- Corak Vertikal Kanan --}}
+    <div class="sambutan-corak sambutan-corak--right" aria-hidden="true"></div>
+
+    {{-- Content (dengan padding agar tidak tertutup corak) --}}
+    <div class="sambutan-content-pad">
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:3rem;align-items:center;" class="sambutan-grid">
+        {{-- Foto --}}
+        <div style="text-align:center;">
+          @if($sambutan->foto)
+            <img src="{{ Storage::url($sambutan->foto) }}"
+                 alt="Foto {{ $sambutan->nama_ketua }}"
+                 style="width:220px;height:260px;object-fit:cover;border-radius:var(--radius);
+                        box-shadow:0 12px 40px rgba(11,79,48,.2);border:4px solid var(--lam-gold);
+                        margin:0 auto;">
+          @else
+            <div style="width:220px;height:260px;background:var(--lam-cream);border-radius:var(--radius);
+                        display:flex;align-items:center;justify-content:center;margin:0 auto;border:4px solid var(--lam-gold);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" stroke="var(--lam-green)" stroke-width="1" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+          @endif
+          <p style="margin-top:1rem;font-weight:700;color:var(--lam-green);font-size:.95rem;">{{ $sambutan->nama_ketua }}</p>
+          <p style="font-size:.8rem;color:var(--lam-text-l);">{{ $sambutan->jabatan }}</p>
+          @if($sambutan->periode_mulai)
+            <p style="font-size:.75rem;color:var(--lam-gold);font-weight:600;">Periode {{ $sambutan->periodeLabel() }}</p>
+          @endif
         </div>
-        <div class="sambutan-konten" style="color:var(--lam-text-m);line-height:1.85;font-size:.95rem;">
-          {!! $sambutan->isi_sambutan !!}
+        {{-- Isi Sambutan --}}
+        <div>
+          <div class="section-heading" style="text-align:left;margin-bottom:1.5rem;">
+            <span class="section-heading__eyebrow">Sambutan</span>
+            <h2 class="section-heading__title">Kata Sambutan Dewan Pimpinan Harian</h2>
+            <div class="section-heading__divider" style="justify-content:flex-start;">
+              <span></span><i></i><span></span>
+            </div>
+          </div>
+          <div class="sambutan-konten" style="color:var(--lam-text-m);line-height:1.85;font-size:.95rem;">
+            {!! $sambutan->isi_sambutan !!}
+          </div>
         </div>
       </div>
     </div>
+
   </div>
 </section>
 
 <style>
   .sambutan-konten p { margin-bottom: 1rem; text-align: justify; }
+  
+  /* Corak motif styles */
+  .sambutan-corak {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 48px;
+    background: url('/images/corak.svg') repeat-y center top;
+    background-size: 48px auto;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .sambutan-corak--left  { left: 0; }
+  .sambutan-corak--right { right: 0; transform: scaleX(-1); }
+  .sambutan-content-pad  { padding-left: 64px; padding-right: 64px; }
+
   @media (max-width: 768px) {
     .sambutan-grid { grid-template-columns: 1fr !important; }
     .sambutan-grid > div:first-child { display: none; }
+    /* Corak lebih kecil di tablet */
+    .sambutan-corak        { width: 28px; background-size: 28px auto; }
+    .sambutan-content-pad  { padding-left: 36px; padding-right: 36px; }
+  }
+  @media (max-width: 576px) {
+    /* Corak lebih kecil lagi di HP kecil */
+    .sambutan-corak        { width: 18px; background-size: 18px auto; opacity: 0.4; }
+    .sambutan-content-pad  { padding-left: 24px; padding-right: 24px; }
   }
 </style>
 @endif

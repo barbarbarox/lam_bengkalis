@@ -26,12 +26,13 @@ class SecurityHeaders
         'X-XSS-Protection'          => '1; mode=block',
         'Permissions-Policy'        => 'camera=(), microphone=(), geolocation=()',
         'Content-Security-Policy'   => "default-src 'self'; "
-            . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://fonts.googleapis.com https://cdn.jsdelivr.net; "
+            . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://fonts.googleapis.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com; "
             . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net; "
-            . "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net; "
-            . "img-src 'self' data: https:; "
+            . "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net; "
+            . "img-src 'self' data: blob: https:; "
             . "frame-src https://www.google.com; "
-            . "connect-src 'self'; "
+            . "connect-src 'self' blob: https://lambengkalis.id https://static.cloudflareinsights.com wss://lambengkalis.id ws://lambengkalis.id; "
+            . "worker-src 'self' blob:; "
             . "object-src 'none'; "
             . "base-uri 'self'; "
             . "form-action 'self';",
@@ -51,9 +52,30 @@ class SecurityHeaders
 
         $response = $next($request);
 
-        // Tambahkan header keamanan pada setiap respons
+        // Panel admin (Filament/Livewire) membutuhkan CSP yang lebih longgar
+        // agar komponen file-upload, preview gambar, dan WebSocket bisa bekerja
+        $isAdminRoute = str_starts_with($request->path(), 'pentadbir');
+
         foreach ($this->securityHeaders as $header => $value) {
-            $response->headers->set($header, $value);
+            if ($header === 'Content-Security-Policy' && $isAdminRoute) {
+                // CSP khusus admin: izinkan koneksi Livewire, blob, dan storage
+                // connect-src harus mengizinkan http: maupun https: karena APP_URL
+                // mungkin masih http:// di server (tergantung konfigurasi hosting).
+                $adminCsp = "default-src 'self'; "
+                    . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com https://static.cloudflareinsights.com; "
+                    . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net; "
+                    . "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net; "
+                    . "img-src 'self' data: blob: http: https:; "
+                    . "frame-src 'self' https://www.google.com; "
+                    . "connect-src 'self' blob: http: https: wss: ws:; "
+                    . "worker-src 'self' blob:; "
+                    . "object-src 'none'; "
+                    . "base-uri 'self'; "
+                    . "form-action 'self' http: https:;";
+                $response->headers->set($header, $adminCsp);
+            } else {
+                $response->headers->set($header, $value);
+            }
         }
 
         // Hapus header server yang mengekspos informasi

@@ -42,12 +42,19 @@
 {{-- Masonry Galeri --}}
 <section style="background:var(--lam-black);padding:3rem 0 5rem;">
   <div class="container">
-    {{-- Masonry Container --}}
-    <div id="masonry-container" style="position:relative;width:100%;transition:height .4s ease;">
+    {{-- Loading State --}}
+    <div id="masonry-loading" style="display:flex;align-items:center;justify-content:center;height:300px;">
+      <div style="text-align:center;">
+        <div class="masonry-spinner"></div>
+        <p style="color:rgba(255,255,255,.4);margin-top:1rem;font-size:.9rem;">Memuat galeri…</p>
+      </div>
+    </div>
+
+    {{-- Masonry Container (hidden until images load) --}}
+    <div id="masonry-container" style="position:relative;width:100%;opacity:0;transition:opacity .5s ease;">
       @foreach($fotos as $foto)
         <div class="masonry-item"
              data-id="{{ $foto->id }}"
-             data-height="{{ 200 + ($foto->id % 5) * 80 }}"
              @if($foto->judul) title="{{ $foto->judul }}" @endif>
           <div class="masonry-img-wrap">
             <img src="{{ Storage::url($foto->foto_path) }}"
@@ -71,7 +78,18 @@
 @endif
 
 <style>
-  /* ── JS Masonry Layout (React Port) ───────────────────────── */
+  /* ── Loading spinner ─────────────────────────────────────────── */
+  .masonry-spinner {
+    width: 40px; height: 40px;
+    margin: 0 auto;
+    border: 3px solid rgba(249,149,34,.2);
+    border-top-color: var(--lam-gold);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── JS Masonry Layout ───────────────────────────────────────── */
   #masonry-container {
     position: relative;
     width: 100%;
@@ -85,7 +103,6 @@
     padding: 6px;
     cursor: pointer;
     top: 0; left: 0;
-    /* Mulai dengan opacity 0, GSAP akan menampilkannya */
     opacity: 0;
   }
 
@@ -94,7 +111,7 @@
     width: 100%; height: 100%;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 10px 50px -10px rgba(0,0,0,.2);
+    box-shadow: 0px 10px 50px -10px rgba(0,0,0,.5);
     background: #1a1a1a;
   }
   
@@ -103,12 +120,14 @@
     object-fit: cover;
     display: block;
     pointer-events: none;
+    transition: transform .5s ease;
   }
+  .masonry-item:hover .masonry-img { transform: scale(1.04); }
 
   /* Overlay gradient */
   .masonry-overlay {
     position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,.75) 0%, transparent 60%);
+    background: linear-gradient(to top, rgba(0,0,0,.8) 0%, transparent 55%);
     opacity: 0;
     transition: opacity .3s;
     border-radius: 10px;
@@ -184,34 +203,34 @@
 </style>
 
 @push('body_scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script>
 (function() {
   const fotoData = @json($fotosJson);
   let lightboxEl = null;
 
-  // Konfigurasi animasi
   const config = {
     ease: 'power3.out',
     duration: 0.6,
     stagger: 0.05,
-    animateFrom: 'bottom',
-    hoverScale: 0.95,
+    hoverScale: 0.97,
     blurToFocus: true
   };
 
-  // Preload gambar
-  const preloadImages = async (urls) => {
-    await Promise.all(
-      urls.map(src => new Promise(resolve => {
-        const img = new Image();
-        img.src = src;
-        img.onload = img.onerror = () => resolve();
-      }))
+  // Preload gambar untuk mendapatkan dimensi asli
+  const preloadImages = async (items) => {
+    return await Promise.all(
+      items.map(data =>
+        new Promise(resolve => {
+          const img = new Image();
+          img.src = data.src;
+          img.onload = () => resolve({ ...data, naturalW: img.naturalWidth, naturalH: img.naturalHeight });
+          img.onerror = () => resolve({ ...data, naturalW: 4, naturalH: 3 }); // fallback 4:3
+        })
+      )
     );
   };
 
-  // Hitung jumlah kolom berdasarkan lebar viewport
   function getColumns(w) {
     if (w >= 1500) return 5;
     if (w >= 1000) return 4;
@@ -220,31 +239,12 @@
     return 1;
   }
 
-  function getInitialPosition(item, animateFrom) {
-    const containerRect = document.getElementById('masonry-container')?.getBoundingClientRect();
-    if (!containerRect) return { x: item.x, y: item.y };
-
-    let direction = animateFrom;
-    if (animateFrom === 'random') {
-      const directions = ['top', 'bottom', 'left', 'right'];
-      direction = directions[Math.floor(Math.random() * directions.length)];
-    }
-
-    switch (direction) {
-      case 'top':    return { x: item.x, y: -200 };
-      case 'bottom': return { x: item.x, y: window.innerHeight + 200 };
-      case 'left':   return { x: -200, y: item.y };
-      case 'right':  return { x: window.innerWidth + 200, y: item.y };
-      case 'center': return { x: containerRect.width / 2 - item.w / 2, y: containerRect.height / 2 - item.h / 2 };
-      default:       return { x: item.x, y: item.y + 100 };
-    }
-  }
-
   let hasMounted = false;
+  let loadedItems = [];
 
   function layoutMasonry() {
     const container = document.getElementById('masonry-container');
-    if (!container || typeof gsap === 'undefined') return;
+    if (!container || typeof gsap === 'undefined' || !loadedItems.length) return;
 
     const itemsEl = Array.from(container.querySelectorAll('.masonry-item'));
     if (!itemsEl.length) return;
@@ -254,83 +254,80 @@
     const colW = width / cols;
     const colHeights = new Array(cols).fill(0);
 
-    // Hitung grid layout (Grid calculation murni)
-    const grid = fotoData.map((data, index) => {
+    const grid = loadedItems.map((data, index) => {
       const col = colHeights.indexOf(Math.min(...colHeights));
       const x = colW * col;
-      // Gunakan tinggi dataset / 2 seperti pengaturan sebelumnya, atau dataset jika tersedia
-      const rawH = data.height || 400;
-      const height = rawH / 2; 
+      // Hitung tinggi proporsional berdasarkan rasio gambar asli
+      const ratio = data.naturalH / data.naturalW;
+      const height = colW * ratio;
       const y = colHeights[col];
-
       colHeights[col] += height;
-      
+
       return { id: data.id, x, y, w: colW, h: height, el: itemsEl[index] };
     });
 
     container.style.height = Math.max(...colHeights) + 'px';
 
-    // Animasi menggunakan state
     grid.forEach((item, index) => {
-      const animationProps = {
-        x: item.x,
-        y: item.y,
-        width: item.w,
-        height: item.h
-      };
+      const animProps = { x: item.x, y: item.y, width: item.w, height: item.h };
 
       if (!hasMounted) {
-        const initialPos = getInitialPosition(item, config.animateFrom);
-        const initialState = {
-          opacity: 0,
-          x: initialPos.x,
-          y: initialPos.y,
-          width: item.w,
-          height: item.h,
-          ...(config.blurToFocus && { filter: 'blur(10px)' })
-        };
-
-        gsap.fromTo(item.el, initialState, {
-          opacity: 1,
-          ...animationProps,
-          ...(config.blurToFocus && { filter: 'blur(0px)' }),
-          duration: 0.8,
-          ease: config.ease,
-          delay: index * config.stagger
-        });
+        gsap.fromTo(item.el,
+          {
+            opacity: 0,
+            x: item.x,
+            y: item.y + 80,
+            width: item.w,
+            height: item.h,
+            ...(config.blurToFocus && { filter: 'blur(8px)' })
+          },
+          {
+            opacity: 1,
+            ...animProps,
+            ...(config.blurToFocus && { filter: 'blur(0px)' }),
+            duration: 0.8,
+            ease: config.ease,
+            delay: index * config.stagger
+          }
+        );
       } else {
-        gsap.to(item.el, {
-          ...animationProps,
-          duration: config.duration,
-          ease: config.ease,
-          overwrite: 'auto'
-        });
+        gsap.to(item.el, { ...animProps, duration: config.duration, ease: config.ease, overwrite: 'auto' });
       }
     });
 
     hasMounted = true;
   }
 
-  function init() {
-    // Jalankan setelah script gsap & gambar siap
-    preloadImages(fotoData.map(i => i.src)).then(() => {
-      layoutMasonry();
-      
-      // Setup Hover Animations
-      document.querySelectorAll('.masonry-item').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-          gsap.to(el, { scale: config.hoverScale, duration: 0.3, ease: 'power2.out' });
-        });
-        el.addEventListener('mouseleave', () => {
-          gsap.to(el, { scale: 1, duration: 0.3, ease: 'power2.out' });
-        });
-        el.addEventListener('click', () => openLightbox(el.dataset.id));
-      });
+  async function init() {
+    const loading = document.getElementById('masonry-loading');
+    const container = document.getElementById('masonry-container');
 
-      // Resize observer
-      const ro = new ResizeObserver(() => layoutMasonry());
-      ro.observe(document.getElementById('masonry-container'));
+    // Load gambar dan dapatkan dimensi aslinya
+    loadedItems = await preloadImages(fotoData);
+
+    // Sembunyikan loading, tampilkan masonry
+    if (loading) loading.style.display = 'none';
+    if (container) container.style.opacity = '1';
+
+    layoutMasonry();
+    
+    // Setup interaksi hover + click
+    document.querySelectorAll('.masonry-item').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        gsap.to(el, { scale: config.hoverScale, duration: 0.3, ease: 'power2.out' });
+      });
+      el.addEventListener('mouseleave', () => {
+        gsap.to(el, { scale: 1, duration: 0.3, ease: 'power2.out' });
+      });
+      el.addEventListener('click', () => openLightbox(el.dataset.id));
     });
+
+    // Re-layout saat resize
+    const ro = new ResizeObserver(() => {
+      hasMounted = true; // Re-layout tanpa animasi masuk ulang
+      layoutMasonry();
+    });
+    if (container) ro.observe(container);
   }
 
   function checkGsap(attempts = 30) {
@@ -344,12 +341,10 @@
     checkGsap();
   }
 
-
-  // ── Lightbox Logic ──────────────────────────────────────────────────────────
+  // ── Lightbox ────────────────────────────────────────────────────────────────
   function openLightbox(id) {
     const foto = fotoData.find(f => String(f.id) === String(id));
     if (!foto) return;
-
     if (lightboxEl) lightboxEl.remove();
 
     lightboxEl = document.createElement('div');
@@ -366,7 +361,6 @@
 
     document.body.appendChild(lightboxEl);
     document.body.style.overflow = 'hidden';
-
     lightboxEl.querySelector('.masonry-lightbox__close').addEventListener('click', closeLightbox);
     lightboxEl.addEventListener('click', e => { if (e.target === lightboxEl) closeLightbox(); });
     document.addEventListener('keydown', onKeyDown);
@@ -381,9 +375,7 @@
     }
   }
 
-  function onKeyDown(e) {
-    if (e.key === 'Escape') closeLightbox();
-  }
+  function onKeyDown(e) { if (e.key === 'Escape') closeLightbox(); }
 })();
 </script>
 @endpush
