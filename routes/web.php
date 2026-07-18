@@ -43,3 +43,7 @@ Route::get('/museum', function () {
     }
     return redirect()->away($url);
 })->name('museum');
+
+// Sitemap XML
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])
+    ->name('sitemap');

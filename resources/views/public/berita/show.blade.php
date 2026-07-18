@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('title', $artikel->judul . ' — ' . ($setting->nama_lembaga ?? 'LAM Bengkalis'))
-@section('meta_description', $artikel->excerpt ?? '')
+@section('meta_description', Str::limit(strip_tags($artikel->excerpt ?? $artikel->konten ?? ''), 155))
+@section('og_type', 'article')
+@section('og_image', $artikel->thumbnail ? Storage::url($artikel->thumbnail) : asset('images/icon-512x512.png'))
 
 @section('content')
 
@@ -82,8 +84,18 @@
 
           {{-- Konten --}}
           <div class="prose-konten artikel-body">
-            {!! $artikel->konten !!}
+            {!! $currentKonten !!}
           </div>
+
+          {{-- Navigasi Halaman Konten (jika artikel panjang) --}}
+          @if($paginator->hasPages())
+          <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px dashed var(--lam-border);">
+            <div style="font-size:0.9rem;color:var(--lam-text-l);margin-bottom:1rem;font-weight:600;">
+              Lanjut ke halaman:
+            </div>
+            {{ $paginator->links() }}
+          </div>
+          @endif
 
           {{-- Share --}}
           <div style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--lam-border);
@@ -215,17 +227,40 @@
 <style>
   .artikel-body { color: var(--lam-text-m); line-height: 1.9; font-size: .975rem; }
   .artikel-body p { margin-bottom: 1.25rem; }
-  .artikel-body h2 { font-family:var(--font-head); color:var(--lam-green); font-size:1.4rem; margin:2rem 0 1rem; }
-  .artikel-body h3 { font-family:var(--font-head); color:var(--lam-text); font-size:1.15rem; margin:1.5rem 0 .75rem; }
+  .artikel-body h1 { font-family:var(--font-head); color:var(--lam-text); font-size:1.75rem; margin:2.5rem 0 1.25rem; font-weight:700; line-height:1.3; }
+  .artikel-body h2 { font-family:var(--font-head); color:var(--lam-green); font-size:1.5rem; margin:2rem 0 1rem; font-weight:700; }
+  .artikel-body h3 { font-family:var(--font-head); color:var(--lam-text); font-size:1.25rem; margin:1.5rem 0 .75rem; font-weight:600; }
+  .artikel-body h4 { font-family:var(--font-head); color:var(--lam-text); font-size:1.15rem; margin:1.25rem 0 .5rem; font-weight:600; }
   .artikel-body ul, .artikel-body ol { margin-left:1.5rem; margin-bottom:1.25rem; }
+  .artikel-body ul { list-style-type: disc; }
+  .artikel-body ol { list-style-type: decimal; }
   .artikel-body li { margin-bottom:.5rem; }
   .artikel-body blockquote {
     border-left:4px solid var(--lam-gold); padding:1rem 1.5rem;
     background:rgba(212,175,55,.06); border-radius:0 var(--radius-sm) var(--radius-sm) 0;
     margin:1.5rem 0; color:var(--lam-text-m); font-style:italic;
   }
-  .artikel-body img { border-radius:var(--radius-sm); margin:1.5rem 0; max-width:100%; }
-  .artikel-body a { color:var(--lam-green); text-decoration:underline; }
+  .artikel-body img { border-radius:var(--radius-sm); margin:1.5rem auto; max-width:100%; display:block; height:auto; }
+  .artikel-body a { color:var(--lam-green); text-decoration:underline; transition:color 0.2s; }
+  .artikel-body a:hover { color:var(--lam-gold); }
+  .artikel-body hr { border: none; border-top: 2px solid var(--lam-border); margin: 2rem 0; }
+  
+  /* Tables */
+  .artikel-body table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; overflow-x: auto; display: block; }
+  @media (min-width: 600px) { .artikel-body table { display: table; } }
+  .artikel-body table th, .artikel-body table td { border: 1px solid var(--lam-border); padding: 0.75rem 1rem; text-align: left; }
+  .artikel-body table th { background: rgba(11, 79, 48, 0.05); font-weight: 600; color: var(--lam-green); }
+  .artikel-body table tbody tr:nth-child(even) { background: rgba(0,0,0,0.015); }
+  
+  /* Code Blocks */
+  .artikel-body code { background: rgba(0,0,0,0.05); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.875em; font-family: monospace; color: #e83e8c; }
+  .artikel-body pre { background: #1e1e1e; color: #d4d4d4; padding: 1.25rem; border-radius: var(--radius-sm); margin: 1.5rem 0; overflow-x: auto; }
+  .artikel-body pre code { background: transparent; padding: 0; color: inherit; font-size: 0.85em; }
+  
+  /* Alignment utilities from TipTap */
+  .artikel-body [style*="text-align: right"] { text-align: right; }
+  .artikel-body [style*="text-align: center"] { text-align: center; }
+  .artikel-body [style*="text-align: justify"] { text-align: justify; }
 
   @media (max-width:900px) {
     .artikel-grid { grid-template-columns:1fr !important; }
@@ -285,3 +320,33 @@
 </style>
 
 @endsection
+
+@push('body_scripts')
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": "{{ addslashes($artikel->judul) }}",
+  "description": "{{ addslashes(Str::limit(strip_tags($artikel->excerpt ?? ''), 155)) }}",
+  "datePublished": "{{ $artikel->tanggal_publish?->toISOString() }}",
+  "dateModified": "{{ $artikel->updated_at->toISOString() }}",
+  "image": "{{ $artikel->thumbnail ? Storage::url($artikel->thumbnail) : asset('images/icon-512x512.png') }}",
+  "url": "{{ url()->current() }}",
+  "inLanguage": "id-ID",
+  @if($artikel->penulis)
+  "author": {
+    "@type": "Person",
+    "name": "{{ addslashes($artikel->penulis->name ?? '') }}"
+  },
+  @endif
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ addslashes($setting->nama_lembaga ?? 'LAM Bengkalis') }}",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ asset('images/icon-192x192.png') }}"
+    }
+  }
+}
+</script>
+@endpush

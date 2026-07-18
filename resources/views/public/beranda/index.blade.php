@@ -482,6 +482,38 @@
 @endsection
 
 @push('body_scripts')
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@type": "GovernmentOrganization",
+  "name": "{{ addslashes($setting->nama_lembaga ?? 'Lembaga Adat Melayu Kabupaten Bengkalis') }}",
+  "alternateName": "LAM Bengkalis",
+  "url": "{{ url('/') }}",
+  "logo": "{{ asset('images/icon-512x512.png') }}",
+  "description": "{{ addslashes($setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Kabupaten Bengkalis.') }}",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Bengkalis",
+    "addressRegion": "Riau",
+    "addressCountry": "ID"
+  }
+  @if($setting->email_kontak || $setting->no_telp)
+  ,"contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service"
+    @if($setting->email_kontak)
+    ,"email": "{{ $setting->email_kontak }}"
+    @endif
+    @if($setting->no_telp)
+    ,"telephone": "{{ $setting->no_telp }}"
+    @endif
+  }
+  @endif
+}
+</script>
+@endpush
+
+@push('body_scripts')
 <script>
 window.lamSlidesData = @json($slides);
 window.lamBannersData = @json($banners);

@@ -5,14 +5,16 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BeritaResource\Pages;
 use App\Models\Berita;
 use App\Models\BeritaKategori;
-use App\Services\HtmlSanitizer;
+use FilamentTiptapEditor\TiptapEditor;
+use FilamentTiptapEditor\Enums\TiptapOutput;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
@@ -20,13 +22,12 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class BeritaResource extends Resource
@@ -47,16 +48,16 @@ class BeritaResource extends Resource
     {
         return $form->schema([
 
-            // Kolom kiri (2/3)
+            // ── Kolom kiri (2/3) ─────────────────────────────────────────────
             Section::make('Konten Berita')
                 ->schema([
+
                     TextInput::make('judul')
                         ->label('Judul Berita')
                         ->required()
                         ->maxLength(500)
                         ->live(onBlur: true)
                         ->afterStateUpdated(function (Set $set, ?string $state, string $operation) {
-                            // Auto-generate slug hanya saat create, bukan saat edit
                             if ($operation === 'create') {
                                 $set('slug', Str::slug($state ?? ''));
                             }
@@ -72,23 +73,75 @@ class BeritaResource extends Resource
                         ->helperText('Diisi otomatis dari judul. Ubah hanya jika diperlukan.')
                         ->columnSpanFull(),
 
-                    RichEditor::make('konten')
-                        ->label('Isi Berita')
-                        ->required()
-                        ->toolbarButtons([
-                            'bold', 'italic', 'underline', 'strike',
-                            'h2', 'h3',
-                            'bulletList', 'orderedList', 'blockquote',
-                            'link', 'codeBlock', 'redo', 'undo',
+                    // ── Pilihan Cara Input Konten ────────────────────────────
+                    \Filament\Forms\Components\Radio::make('input_mode')
+                        ->label('Cara Input Konten')
+                        ->options([
+                            'manual' => 'Buat Manual (Ketik Sendiri)',
+                            'word'   => 'Import dari File Word (.docx)',
                         ])
-                        ->fileAttachmentsDisk('public')
-                        ->fileAttachmentsDirectory('berita/lampiran')
-                        ->helperText('Konten akan disanitasi otomatis sebelum disimpan (XSS protection).')
+                        ->default('manual')
+                        ->inline()
+                        ->live()
+                        ->hidden(fn (string $operation) => $operation === 'edit')
+                        ->columnSpanFull(),
+
+                    // ── Mode: Buat Manual ────────────────────────────────────
+                    TiptapEditor::make('konten')
+                        ->label('Isi Berita')
+                        ->required(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'edit' || $get('input_mode') === 'manual')
+                        ->output(TiptapOutput::Html)
+                        ->profile('default')
+                        ->disk('public')
+                        ->directory('berita/lampiran')
+                        ->maxContentWidth('full')
+                        ->columnSpanFull()
+                        ->extraInputAttributes([
+                            'style' => 'min-height: 400px;',
+                        ])
+                        ->hidden(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'create' && $get('input_mode') === 'word'),
+
+                    // ── Mode: Import Word ────────────────────────────────────
+                    FileUpload::make('word_file')
+                        ->label('Upload File Word (.docx)')
+                        ->disk('public')
+                        ->directory('temp/word-import')
+                        ->visibility('private')
+                        ->acceptedFileTypes([
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'application/msword',
+                        ])
+                        ->maxSize(10240) // 10 MB
+                        ->storeFileNamesIn('word_file_original_name')
+                        ->helperText(
+                            'Upload file .docx (maks. 10 MB). ' .
+                            'Klik Simpan untuk memproses dan mengisi konten secara otomatis.'
+                        )
+                        ->required(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'create' && $get('input_mode') === 'word')
+                        ->hidden(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'edit' || $get('input_mode') === 'manual')
+                        ->columnSpanFull(),
+
+                    Placeholder::make('word_import_info')
+                        ->label('')
+                        ->content(new HtmlString(
+                            '<div class="rounded-xl border border-primary-200 bg-primary-50 p-4 text-sm text-primary-900 dark:border-primary-800 dark:bg-primary-950 dark:text-primary-200">' .
+                            '<p class="font-semibold mb-2">📌 Cara Kerja Import Word:</p>' .
+                            '<ul class="list-disc list-inside space-y-1">' .
+                            '<li>Format didukung: <strong>.docx</strong> (Microsoft Word 2007 atau lebih baru)</li>' .
+                            '<li>Heading (H1–H6), paragraf, <strong>bold</strong>, <em>italic</em>, <u>underline</u> dikonversi otomatis</li>' .
+                            '<li>Tabel dalam dokumen dikonversi menjadi tabel HTML</li>' .
+                            '<li>Gambar dalam dokumen diekstrak dan diunggah ke server</li>' .
+                            '<li>Judul berita diambil otomatis dari heading pertama dokumen</li>' .
+                            '<li>Setelah tersimpan, konten bisa diedit via mode Manual</li>' .
+                            '</ul>' .
+                            '</div>'
+                        ))
+                        ->hidden(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'edit' || $get('input_mode') === 'manual')
                         ->columnSpanFull(),
                 ])
                 ->columnSpan(2),
 
-            // Kolom kanan (1/3)
+            // ── Kolom kanan (1/3) ─────────────────────────────────────────────
             Section::make('Metadata & Publikasi')
                 ->schema([
                     Select::make('berita_kategori_id')

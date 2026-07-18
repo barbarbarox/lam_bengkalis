@@ -36,7 +36,7 @@ class BeritaController extends Controller
         return view('public.berita.index', compact('setting', 'kategori', 'berita'));
     }
 
-    public function show(string $slug)
+    public function show(string $slug, Request $request)
     {
         $setting = SiteSetting::instance();
 
@@ -47,6 +47,27 @@ class BeritaController extends Controller
 
         // Tambah view counter (atomic increment)
         $artikel->tambahView();
+
+        // Paginate konten HTML
+        $maxLength = 3000; // batas karakter teks per halaman
+        $pages = \App\Services\HtmlPaginator::paginate($artikel->konten ?? '', $maxLength);
+        
+        $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
+        // Pastikan current page valid
+        if ($currentPage > count($pages) || $currentPage < 1) {
+            $currentPage = 1;
+        }
+        
+        $currentKonten = $pages[$currentPage - 1];
+        
+        // Buat LengthAwarePaginator manual
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            [$currentKonten], // item di halaman ini (hanya 1 chunk html)
+            count($pages), // total item (total halaman)
+            1, // per page (1 item per halaman)
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         // Berita terkait (kategori sama, 3 artikel)
         $terkait = Berita::published()
@@ -64,6 +85,6 @@ class BeritaController extends Controller
             ->limit(3)
             ->get();
 
-        return view('public.berita.show', compact('setting', 'artikel', 'terkait', 'rekomendasi'));
+        return view('public.berita.show', compact('setting', 'artikel', 'currentKonten', 'paginator', 'terkait', 'rekomendasi'));
     }
 }

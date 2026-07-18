@@ -11,10 +11,28 @@
   <title>@yield('title', config('app.name', 'LAM Bengkalis'))</title>
   <meta name="description" content="@yield('meta_description', $setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Kabupaten Bengkalis.')">
 
+  {{-- Canonical URL --}}
+  <link rel="canonical" href="{{ url()->current() }}">
+
+  {{-- Open Graph (Google + Sosial Media) --}}
+  <meta property="og:type"        content="@yield('og_type', 'website')">
+  <meta property="og:site_name"   content="{{ $setting->nama_lembaga ?? 'LAM Bengkalis' }}">
+  <meta property="og:url"         content="{{ url()->current() }}">
+  <meta property="og:title"       content="@yield('title', config('app.name', 'LAM Bengkalis'))">
+  <meta property="og:description" content="@yield('meta_description', $setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Kabupaten Bengkalis.')">
+  <meta property="og:image"       content="@yield('og_image', asset('images/icon-512x512.png'))">
+  <meta property="og:locale"      content="id_ID">
+
+  {{-- Twitter Card --}}
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="@yield('title', config('app.name', 'LAM Bengkalis'))">
+  <meta name="twitter:description" content="@yield('meta_description', $setting->meta_deskripsi ?? '')">
+  <meta name="twitter:image"       content="@yield('og_image', asset('images/icon-512x512.png'))">
+
   {{-- PWA Setup --}}
   <link rel="manifest" href="{{ asset('manifest.json') }}">
   <link rel="apple-touch-icon" href="{{ asset('images/icon-192x192.png') }}">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   {{-- Google Fonts --}}
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -302,6 +320,7 @@
       font-size: .95rem; font-weight: 500;
       transition: color var(--transition), background var(--transition);
       border-left: 3px solid transparent;
+      display: flex; align-items: center;
     }
     .navbar__mobile-link:hover { 
       color: var(--lam-gold); 
@@ -315,6 +334,91 @@
       border-radius: var(--radius-sm); font-weight: 700;
       display: flex; align-items: center; justify-content: center; gap: .5rem;
       box-shadow: 0 4px 15px rgba(212, 160, 23, 0.2);
+    }
+
+    /* Mobile Layanan Accordion */
+    .navbar__mobile-accordion {
+      display: flex; flex-direction: column;
+    }
+    .navbar__mobile-accordion-btn {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .85rem 1.5rem;
+      color: rgba(255,255,255,.85);
+      font-size: .95rem; font-weight: 500;
+      background: none; border: none; cursor: pointer; width: 100%;
+      text-align: left;
+      transition: color var(--transition), background var(--transition);
+      border-left: 3px solid transparent;
+    }
+    .navbar__mobile-accordion-btn:hover,
+    .navbar__mobile-accordion-btn.is-open {
+      color: var(--lam-gold);
+      background: rgba(255,255,255,.02);
+      border-left-color: var(--lam-gold);
+    }
+    .navbar__mobile-accordion-btn .acc-label {
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .navbar__mobile-accordion-btn .acc-chevron {
+      transition: transform .25s ease;
+      flex-shrink: 0;
+      color: rgba(255,255,255,.45);
+    }
+    .navbar__mobile-accordion-btn.is-open .acc-chevron {
+      transform: rotate(180deg);
+      color: var(--lam-gold);
+    }
+    .navbar__mobile-accordion-body {
+      display: none;
+      flex-direction: column;
+      background: rgba(0,0,0,.25);
+      border-left: 3px solid rgba(249,149,34,.3);
+      margin-left: 1.5rem;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      overflow: hidden;
+    }
+    .navbar__mobile-accordion-body.is-open {
+      display: flex;
+      animation: accFade .2s ease;
+    }
+    @keyframes accFade {
+      from { opacity:0; transform: translateY(-6px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .navbar__mobile-sublink {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .7rem 1rem;
+      color: rgba(255,255,255,.75); font-size: .88rem;
+      transition: color var(--transition), background var(--transition);
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .navbar__mobile-sublink:last-child { border-bottom: none; }
+    .navbar__mobile-sublink:hover {
+      color: var(--lam-gold);
+      background: rgba(249,149,34,.08);
+    }
+    .navbar__mobile-sublink-icon {
+      width: 32px; height: 32px;
+      background: rgba(249,149,34,.12);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .navbar__mobile-sublink-icon img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .navbar__mobile-sublink-icon svg {
+      width: 16px; height: 16px; color: var(--lam-gold);
+    }
+    .navbar__mobile-sublink-text {
+      display: flex; flex-direction: column; line-height: 1.3;
+    }
+    .navbar__mobile-sublink-title {
+      font-weight: 600; font-size: .88rem;
+    }
+    .navbar__mobile-sublink-desc {
+      font-size: .73rem; color: rgba(255,255,255,.4); margin-top: .1rem;
     }
 
     @media (max-width: 768px) {
@@ -684,18 +788,84 @@
     <a href="{{ route('galeri') }}"       class="navbar__mobile-link" @click="open=false">Galeri</a>
     <a href="{{ route('kontak') }}"       class="navbar__mobile-link" @click="open=false">Kontak</a>
 
-    {{-- Layanan Mobile --}}
+    {{-- Layanan Mobile (Accordion Submenu) --}}
     @if(isset($layanans) && $layanans->count() > 0)
-      <div style="padding: .5rem 1.5rem .25rem; font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; color:var(--lam-gold); font-weight:700;">Layanan</div>
-      @foreach($layanans as $layanan)
-        @php $isExt = $layanan->url && (str_starts_with($layanan->url,'http://') || str_starts_with($layanan->url,'https://')); @endphp
-        <a href="{{ $layanan->url ?: '#' }}" class="navbar__mobile-link"
-           @click="open=false"
-           @if($isExt) target="_blank" rel="noopener noreferrer" @endif>
-          {{ $layanan->nama }}
-          @if($isExt)<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;margin-left:.25rem;opacity:.5;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>@endif
-        </a>
-      @endforeach
+      <div class="navbar__mobile-accordion" x-data="{ layananOpen: false }">
+        {{-- Accordion Toggle Button --}}
+        <button
+          class="navbar__mobile-accordion-btn"
+          :class="layananOpen ? 'is-open' : ''"
+          @click="layananOpen = !layananOpen"
+          :aria-expanded="layananOpen"
+          aria-controls="mobile-layanan-body"
+        >
+          <span class="acc-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true"
+                 style="color:var(--lam-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            </svg>
+            Layanan
+          </span>
+          <svg class="acc-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+               fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        {{-- Accordion Body --}}
+        <div
+          id="mobile-layanan-body"
+          class="navbar__mobile-accordion-body"
+          :class="layananOpen ? 'is-open' : ''"
+          role="menu"
+        >
+          @foreach($layanans as $layanan)
+            @php $isExt = $layanan->url && (str_starts_with($layanan->url,'http://') || str_starts_with($layanan->url,'https://')); @endphp
+            <a
+              href="{{ $layanan->url ?: '#' }}"
+              class="navbar__mobile-sublink"
+              role="menuitem"
+              @click="open=false; layananOpen=false"
+              @if($isExt) target="_blank" rel="noopener noreferrer" @endif
+            >
+              {{-- Ikon / Gambar dari database --}}
+              <span class="navbar__mobile-sublink-icon">
+                @if($layanan->jenis_icon === 'image' && $layanan->image)
+                  <img src="{{ Storage::url($layanan->image) }}" alt="{{ $layanan->nama }}">
+                @elseif($layanan->icon)
+                  <x-dynamic-component :component="$layanan->icon" aria-hidden="true" />
+                @else
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                       stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                @endif
+              </span>
+
+              {{-- Teks Layanan --}}
+              <span class="navbar__mobile-sublink-text">
+                <span class="navbar__mobile-sublink-title">
+                  {{ $layanan->nama }}
+                  @if($isExt)
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none"
+                         stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                         style="display:inline;margin-left:.2rem;opacity:.5;">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                      <polyline points="15 3 21 3 21 9"/>
+                      <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                  @endif
+                </span>
+                @if($layanan->deskripsi)
+                  <span class="navbar__mobile-sublink-desc">{{ Str::limit($layanan->deskripsi, 50) }}</span>
+                @endif
+              </span>
+            </a>
+          @endforeach
+        </div>
+      </div>
     @endif
     
     {{-- Theme Toggle (Mobile) --}}
@@ -844,47 +1014,56 @@
   }
 
   // 2. Custom Install Prompt Logic
-  let deferredPrompt;
-  const pwaBanner = document.getElementById('pwa-install-banner');
-  const installBtn = document.getElementById('pwa-install-btn');
-  const closeBtn = document.getElementById('pwa-close-btn');
+  (function() {
+    if (window.lamPwaInitialized) return;
+    window.lamPwaInitialized = true;
+    
+    window.deferredPrompt = window.deferredPrompt || null;
+    const pwaBanner = document.getElementById('pwa-install-banner');
+    const installBtn = document.getElementById('pwa-install-btn');
+    const closeBtn = document.getElementById('pwa-close-btn');
 
-  // Cek apakah user pernah menolak install sebelumnya
-  const hasDeclined = localStorage.getItem('lam_pwa_declined');
+    // Cek apakah user pernah menolak install sebelumnya
+    const hasDeclined = localStorage.getItem('lam_pwa_declined');
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent browser's default prompt
-    e.preventDefault();
-    deferredPrompt = e;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent browser's default prompt
+      e.preventDefault();
+      window.deferredPrompt = e;
 
-    // Show banner only if user hasn't declined recently and isn't already installed
-    if (!hasDeclined && !window.matchMedia('(display-mode: standalone)').matches) {
-      pwaBanner.style.display = 'flex';
-    }
-  });
-
-  installBtn.addEventListener('click', async () => {
-    pwaBanner.style.display = 'none';
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        console.log('User accepted the PWA prompt');
+      // Show banner only if user hasn't declined recently and isn't already installed
+      if (!hasDeclined && !window.matchMedia('(display-mode: standalone)').matches) {
+        if(pwaBanner) pwaBanner.style.display = 'flex';
       }
-      deferredPrompt = null;
+    });
+
+    if(installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if(pwaBanner) pwaBanner.style.display = 'none';
+        if (window.deferredPrompt) {
+          window.deferredPrompt.prompt();
+          const { outcome } = await window.deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            console.log('User accepted the PWA prompt');
+          }
+          window.deferredPrompt = null;
+        }
+      });
     }
-  });
 
-  closeBtn.addEventListener('click', () => {
-    pwaBanner.style.display = 'none';
-    // Simpan penolakan agar tidak mengganggu setiap saat
-    localStorage.setItem('lam_pwa_declined', 'true');
-  });
+    if(closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        if(pwaBanner) pwaBanner.style.display = 'none';
+        // Simpan penolakan agar tidak mengganggu setiap saat
+        localStorage.setItem('lam_pwa_declined', 'true');
+      });
+    }
 
-  window.addEventListener('appinstalled', () => {
-    pwaBanner.style.display = 'none';
-    deferredPrompt = null;
-  });
+    window.addEventListener('appinstalled', () => {
+      if(pwaBanner) pwaBanner.style.display = 'none';
+      window.deferredPrompt = null;
+    });
+  })();
 </script>
 
 @stack('body_scripts')

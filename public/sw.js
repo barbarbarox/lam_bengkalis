@@ -1,5 +1,5 @@
 // Basic Service Worker for PWA
-const CACHE_NAME = 'lam-bengkalis-pwa-v1';
+const CACHE_NAME = 'lam-bengkalis-pwa-v2';
 const urlsToCache = [
   '/',
   '/manifest.json',
@@ -21,6 +21,15 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Hanya intercept method GET
+  if (event.request.method !== 'GET') return;
+
+  // Jangan intercept request ke admin panel dan livewire
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith('/pentadbir') || url.pathname.startsWith('/livewire')) {
+    return;
+  }
+
   // Stale-while-revalidate strategy for basic PWA compatibility
   event.respondWith(
     caches.match(event.request)

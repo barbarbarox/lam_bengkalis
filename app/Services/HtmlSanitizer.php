@@ -32,7 +32,29 @@ class HtmlSanitizer
             return '';
         }
 
-        return Purifier::clean($html, 'default');
+        return Purifier::clean($html, [
+            'HTML.Allowed' =>
+                'h1,h2,h3,h4,h5,h6,' .
+                'p[style],' .
+                'br,' .
+                'strong,em,u,s,del,ins,mark,sub,sup,' .
+                'a[href|title|target|rel],' .
+                'ul,ol,li,' .
+                'blockquote,pre,code,' .
+                'hr,' .
+                'img[src|alt|width|height|style],' .
+                'table[style],thead,tbody,tfoot,' .
+                'tr[style],th[style|colspan|rowspan],td[style|colspan|rowspan],' .
+                'figure,figcaption,' .
+                'div[class|style],span[class|style]',
+            'CSS.AllowedProperties' =>
+                'text-align,margin,padding,width,height,max-width,' .
+                'border,border-collapse,border-spacing,' .
+                'background-color,color,font-weight,font-style,text-decoration',
+            'HTML.SafeIframe'   => true,
+            'URI.SafeIframeRegexp' => '%^https://%',
+            'AutoFormat.RemoveEmpty' => false,
+        ]);
     }
 
     /**

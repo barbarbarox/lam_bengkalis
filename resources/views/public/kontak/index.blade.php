@@ -26,13 +26,74 @@
   .page-hero{position:relative;padding:5rem 0 4rem;text-align:center;background-color:var(--lam-black);background-size:cover;background-position:center;background-repeat:no-repeat;}
   .page-hero__overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,rgba(0,0,0,.4) 60%,rgba(0,0,0,.7) 100%);z-index:1;}
   .page-hero__gold-edge{position:absolute;inset:0;background:linear-gradient(to right,rgba(249,149,34,.35) 0%,transparent 18%,transparent 82%,rgba(249,149,34,.35) 100%),linear-gradient(to bottom,rgba(249,149,34,.2) 0%,transparent 30%);z-index:1;pointer-events:none;}
+
+  /* ── Kontak Layout ─────────────────────────── */
+  .kontak-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  /* ── Peta Responsif ────────────────────────── */
+  .peta-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    overflow: hidden;
+    border-radius: var(--radius);
+    box-shadow: var(--lam-shadow);
+  }
+  .peta-wrapper iframe {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+  }
+
+  /* ── Form Grid ─────────────────────────────── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .form-col-full { grid-column: 1 / -1; }
+
+  /* ── Kontak Card ───────────────────────────── */
+  .kontak-form-card {
+    background: var(--lam-bg-alt);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    box-shadow: var(--lam-shadow);
+  }
+
+  /* ── Responsive ────────────────────────────── */
+  @media (max-width: 860px) {
+    .kontak-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+  @media (max-width: 600px) {
+    .kontak-form-card {
+      padding: 1.25rem 1rem;
+      border-radius: var(--radius-sm);
+    }
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    .form-col-full { grid-column: 1; }
+    .peta-wrapper { padding-bottom: 65%; }
+  }
 </style>
 
 
 
 <section class="section-pad" style="background:var(--lam-cream);">
   <div class="container">
-    <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:3rem;align-items:start;" class="kontak-grid">
+    <div class="kontak-grid">
 
       {{-- Info Kontak + Peta --}}
       <div>
@@ -82,14 +143,14 @@
 
         {{-- Embed Peta --}}
         @if($setting->embed_peta && str_contains($setting->embed_peta, 'google.com/maps/embed'))
-          <div style="border-radius:var(--radius);overflow:hidden;box-shadow:var(--lam-shadow);">
+          <div class="peta-wrapper">
             {!! $setting->embed_peta !!}
           </div>
         @endif
       </div>
 
       {{-- Formulir Pengaduan --}}
-      <div style="background:var(--lam-bg-alt);border-radius:var(--radius);padding:2.5rem;box-shadow:var(--lam-shadow);">
+      <div class="kontak-form-card">
         <h2 style="font-family:var(--font-head);font-size:1.35rem;color:var(--lam-gold);margin-bottom:.5rem;">Kirim Pesan / Pengaduan</h2>
         <p style="font-size:.875rem;color:var(--lam-gold);margin-bottom:1.75rem;">
           Semua kolom bertanda <span style="color:#c0392b;">*</span> wajib diisi.
@@ -126,10 +187,10 @@
           {{-- Hidden reCAPTCHA token --}}
           <input type="hidden" name="g-recaptcha-response" id="recaptchaToken">
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-grid">
 
             {{-- Nama --}}
-            <div style="grid-column:1/-1;">
+            <div class="form-col-full">
               <label for="nama_pengadu" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-gold);margin-bottom:.35rem;">
                 Nama Lengkap <span style="color:#c0392b;" aria-hidden="true">*</span>
               </label>
@@ -170,7 +231,7 @@
             </div>
 
             {{-- Subjek --}}
-            <div style="grid-column:1/-1;">
+            <div class="form-col-full">
               <label for="subjek" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-gold);margin-bottom:.35rem;">
                 Subjek <span style="color:#c0392b;" aria-hidden="true">*</span>
               </label>
@@ -184,7 +245,7 @@
             </div>
 
             {{-- Isi --}}
-            <div style="grid-column:1/-1;">
+            <div class="form-col-full">
               <label for="isi_aduan" style="display:block;font-size:.82rem;font-weight:600;color:var(--lam-gold);margin-bottom:.35rem;">
                 Isi Pesan / Pengaduan <span style="color:#c0392b;" aria-hidden="true">*</span>
               </label>
@@ -197,14 +258,14 @@
             </div>
 
             {{-- reCAPTCHA notice --}}
-            <p style="grid-column:1/-1;font-size:.73rem;color:var(--lam-text-l);">
+            <p class="form-col-full" style="font-size:.73rem;color:var(--lam-text-l);">
               Formulir ini dilindungi reCAPTCHA Google.
               <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color:var(--lam-green);">Kebijakan Privasi</a> dan
               <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style="color:var(--lam-green);">Ketentuan Layanan</a> berlaku.
             </p>
 
             {{-- Submit --}}
-            <div style="grid-column:1/-1;">
+            <div class="form-col-full">
               <button type="submit" class="btn btn-primary" id="btnKirim" style="width:100%;justify-content:center;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                 Kirim Pesan
@@ -219,11 +280,7 @@
   </div>
 </section>
 
-<style>
-  @media (max-width:860px) {
-    .kontak-grid { grid-template-columns: 1fr !important; }
-  }
-</style>
+
 
 @push('body_scripts')
 <script>

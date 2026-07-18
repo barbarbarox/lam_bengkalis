@@ -10,4 +10,4 @@ Disallow: /pentadbir/
 Disallow: /up
 Disallow: /livewire/
 
-Sitemap: https://lam-bengkalis.go.id/sitemap.xml
+Sitemap: https://lambengkalis.id/sitemap.xml

@@ -1,0 +1,229 @@
+/**
+ * CSS Kustom Panel Admin LAM Bengkalis
+ * Dipasang via AdminPanelProvider::renderHook / FilamentAsset
+ */
+
+/* ─── TipTap Editor: Ukuran & Tampilan ─────────────────────────────────────── */
+
+/* Area konten editor — min-height agar tidak terlalu kecil */
+.tiptap-wrapper .ProseMirror {
+    min-height: 400px !important;
+    padding: 1rem 1.25rem !important;
+    outline: none;
+    line-height: 1.7;
+    font-size: 0.9375rem;
+}
+
+/* Placeholder teks */
+.tiptap-wrapper .ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: #9ca3af;
+    pointer-events: none;
+    height: 0;
+}
+
+/* Toolbar: tinggi & padding lebih nyaman */
+.tiptap-editor .tiptap-toolbar {
+    padding: 0.4rem 0.5rem;
+    border-bottom: 1px solid rgb(var(--gray-200)) !important;
+    flex-wrap: wrap !important;
+    gap: 2px;
+    min-height: 44px;
+    align-items: center;
+}
+
+.dark .tiptap-editor .tiptap-toolbar {
+    border-bottom-color: rgb(var(--gray-700)) !important;
+}
+
+/* Tombol toolbar */
+.tiptap-editor .tiptap-toolbar button {
+    padding: 0.3rem 0.4rem;
+    border-radius: 0.375rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    min-width: 28px;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    line-height: 1;
+}
+
+/* Tombol aktif */
+.tiptap-editor .tiptap-toolbar button.is-active,
+.tiptap-editor .tiptap-toolbar button[aria-pressed="true"] {
+    background-color: rgba(var(--primary-100), 1) !important;
+    color: rgba(var(--primary-700), 1) !important;
+}
+
+.dark .tiptap-editor .tiptap-toolbar button.is-active,
+.dark .tiptap-editor .tiptap-toolbar button[aria-pressed="true"] {
+    background-color: rgba(var(--primary-900), 0.5) !important;
+    color: rgba(var(--primary-300), 1) !important;
+}
+
+/* Hover tombol toolbar */
+.tiptap-editor .tiptap-toolbar button:hover:not(:disabled) {
+    background-color: rgb(var(--gray-100));
+    color: rgb(var(--gray-900));
+}
+
+.dark .tiptap-editor .tiptap-toolbar button:hover:not(:disabled) {
+    background-color: rgb(var(--gray-700));
+    color: rgb(var(--gray-100));
+}
+
+/* Separator toolbar */
+.tiptap-editor .tiptap-toolbar .separator {
+    width: 1px;
+    height: 20px;
+    background-color: rgb(var(--gray-200));
+    margin: 0 4px;
+}
+
+.dark .tiptap-editor .tiptap-toolbar .separator {
+    background-color: rgb(var(--gray-700));
+}
+
+/* ─── TipTap: Konten Styling ────────────────────────────────────────────────── */
+
+.tiptap-wrapper .ProseMirror h1 { font-size: 1.875rem; font-weight: 700; margin: 1.25rem 0 0.75rem; }
+.tiptap-wrapper .ProseMirror h2 { font-size: 1.5rem;   font-weight: 700; margin: 1rem 0 0.5rem; }
+.tiptap-wrapper .ProseMirror h3 { font-size: 1.25rem;  font-weight: 600; margin: 0.875rem 0 0.5rem; }
+.tiptap-wrapper .ProseMirror h4 { font-size: 1.125rem; font-weight: 600; margin: 0.75rem 0 0.375rem; }
+
+.tiptap-wrapper .ProseMirror p  { margin-bottom: 0.75rem; }
+
+.tiptap-wrapper .ProseMirror ul,
+.tiptap-wrapper .ProseMirror ol {
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.tiptap-wrapper .ProseMirror li { margin-bottom: 0.25rem; }
+
+.tiptap-wrapper .ProseMirror blockquote {
+    border-left: 4px solid rgb(var(--primary-500));
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: rgb(var(--gray-600));
+    font-style: italic;
+}
+
+.dark .tiptap-wrapper .ProseMirror blockquote {
+    border-left-color: rgb(var(--primary-400));
+    color: rgb(var(--gray-400));
+}
+
+.tiptap-wrapper .ProseMirror code {
+    background-color: rgb(var(--gray-100));
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+    font-family: ui-monospace, monospace;
+}
+
+.dark .tiptap-wrapper .ProseMirror code {
+    background-color: rgb(var(--gray-800));
+}
+
+.tiptap-wrapper .ProseMirror pre {
+    background-color: rgb(var(--gray-900));
+    color: rgb(var(--gray-100));
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+}
+
+.tiptap-wrapper .ProseMirror pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: 0.875em;
+}
+
+.tiptap-wrapper .ProseMirror hr {
+    border: none;
+    border-top: 2px solid rgb(var(--gray-200));
+    margin: 1.5rem 0;
+}
+
+.dark .tiptap-wrapper .ProseMirror hr {
+    border-top-color: rgb(var(--gray-700));
+}
+
+/* ─── TipTap: Tabel ─────────────────────────────────────────────────────────── */
+
+.tiptap-wrapper .ProseMirror table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+    font-size: 0.9375rem;
+    overflow: hidden;
+    border-radius: 0.375rem;
+}
+
+.tiptap-wrapper .ProseMirror table th,
+.tiptap-wrapper .ProseMirror table td {
+    border: 1px solid rgb(var(--gray-200));
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+    min-width: 60px;
+}
+
+.dark .tiptap-wrapper .ProseMirror table th,
+.dark .tiptap-wrapper .ProseMirror table td {
+    border-color: rgb(var(--gray-700));
+}
+
+.tiptap-wrapper .ProseMirror table th {
+    background-color: rgb(var(--gray-100));
+    font-weight: 600;
+}
+
+.dark .tiptap-wrapper .ProseMirror table th {
+    background-color: rgb(var(--gray-800));
+}
+
+/* Sel yang sedang dipilih */
+.tiptap-wrapper .ProseMirror table .selectedCell::after {
+    background: rgba(var(--primary-200), 0.5);
+    content: '';
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 2;
+}
+
+.tiptap-wrapper .ProseMirror table .selectedCell {
+    position: relative;
+}
+
+/* ─── Fullscreen mode ───────────────────────────────────────────────────────── */
+
+.tiptap-fullscreen {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9999 !important;
+    border-radius: 0 !important;
+    overflow-y: auto;
+    background: white;
+}
+
+.dark .tiptap-fullscreen {
+    background: rgb(var(--gray-900));
+}
+
+.tiptap-fullscreen .ProseMirror {
+    min-height: calc(100vh - 60px) !important;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem !important;
+}
