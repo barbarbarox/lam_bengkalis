@@ -10,145 +10,272 @@
 --}}
 
 <style>
+  /* ─── Design Tokens ─────────────────────────────────────────── */
   :root {
-    --lk-green:      #0B4F30;
-    --lk-gold:       #D4AF37;
-    --lk-gold-deep:  #B8941F;
-    --lk-red:        #7A1E1E;
-    --lk-cream:      #F5EEDD;
-    --lk-wave-back:  rgba(11,79,48,.35);
-    --lk-wave-mid:   rgba(11,79,48,.55);
-    --lk-wave-front: rgba(11,79,48,.8);
+    --lk-bg:           #0a0a0a;
+    --lk-gold:         #F99522;
+    --lk-gold-bright:  #FFC90E;
+    --lk-gold-deep:    #c97010;
+    --lk-red:          #EB2D3A;
+    --lk-cream:        #f5f0e8;
+    --lk-cream-muted:  rgba(245,240,232,.65);
+    --lk-wave-back:    rgba(249,149,34,.07);
+    --lk-wave-mid:     rgba(249,149,34,.12);
+    --lk-wave-front:   rgba(249,149,34,.19);
   }
 
+  /* ─── Full-Screen Overlay ───────────────────────────────────── */
   .lam-loader {
-    position:fixed; inset:0; z-index:9999;
-    background:var(--lk-green);
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    transition:opacity .7s ease, visibility .7s ease;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 2.5vw, 20px);
+    padding: clamp(1.5rem, 5vw, 3rem);
+    background: radial-gradient(ellipse 80% 55% at 50% 38%, #1c1305 0%, #0a0a0a 68%);
+    transition: opacity .85s cubic-bezier(.4,0,.2,1), visibility .85s ease;
+    overflow: hidden;
   }
   .lam-loader.is-done {
-    opacity:0; visibility:hidden; pointer-events:none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 
+  /* ─── Ambient Gold Glow (decorative) ────────────────────────── */
+  .lam-loader::before {
+    content: '';
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: clamp(240px, 48vw, 500px);
+    height: clamp(160px, 28vw, 340px);
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(249,149,34,.13) 0%, transparent 72%);
+    pointer-events: none;
+    animation: lk-orb-pulse 4.2s ease-in-out infinite;
+  }
+
+  /* ─── Floating Particles ────────────────────────────────────── */
   .lam-loader__stars {
-    position:absolute; inset:0; pointer-events:none;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
   }
   .lam-loader__stars span {
-    position:absolute;
-    width:4px; height:4px; border-radius:50%;
-    background:var(--lk-gold);
-    animation:lk-twinkle 2s infinite ease-in-out;
+    position: absolute;
+    border-radius: 50%;
+    background: var(--lk-gold-bright);
+    box-shadow: 0 0 5px 1px rgba(255,201,14,.5);
+    animation: lk-twinkle 2.4s infinite ease-in-out;
   }
+  .lam-loader__stars span:nth-child(1) { width: 3px; height: 3px; }
+  .lam-loader__stars span:nth-child(2) { width: 2px; height: 2px; }
+  .lam-loader__stars span:nth-child(3) { width: 4px; height: 4px; }
+  .lam-loader__stars span:nth-child(4) { width: 2px; height: 2px; }
+  .lam-loader__stars span:nth-child(5) { width: 3px; height: 3px; }
 
+  /* ─── Header ────────────────────────────────────────────────── */
   .lam-loader__header {
-    text-align:center; color:var(--lk-cream); margin-bottom:12px; z-index:1;
+    text-align: center;
+    color: var(--lk-cream);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
   }
   .lam-loader__eyebrow {
-    display:block; font-family:'Inter',sans-serif;
-    font-size:clamp(.65rem,.9vw,.75rem);
-    letter-spacing:.3em; text-transform:uppercase;
-    opacity:.7; margin-bottom:4px;
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(.58rem, 1.1vw, .7rem);
+    letter-spacing: .38em;
+    text-transform: uppercase;
+    color: var(--lk-cream-muted);
+    font-weight: 400;
+    margin-bottom: 2px;
   }
   .lam-loader__title {
-    font-family:'Playfair Display',serif;
-    font-size:clamp(1.1rem,2.5vw,1.6rem);
-    font-weight:700; margin:0; color:var(--lk-gold);
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 3.2vw, 1.75rem);
+    font-weight: 700;
+    margin: 0;
+    color: var(--lk-gold);
+    text-shadow: 0 0 30px rgba(249,149,34,.5), 0 2px 8px rgba(0,0,0,.7);
+    letter-spacing: .025em;
+    line-height: 1.25;
   }
+
+  /* ─── Ornamental Divider ────────────────────────────────────── */
   .lam-loader__divider {
-    display:flex; align-items:center; justify-content:center;
-    gap:6px; margin-top:8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
   }
   .lam-loader__divider span {
-    display:block; height:1px; width:40px;
-    background:var(--lk-gold); opacity:.4;
+    display: block;
+    height: 1px;
+    width: clamp(30px, 5vw, 52px);
+    background: linear-gradient(90deg, transparent, var(--lk-gold), transparent);
+    opacity: .5;
   }
   .lam-loader__divider i {
-    display:block; width:6px; height:6px; border-radius:50%;
-    background:var(--lk-gold); opacity:.8; font-style:normal;
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--lk-gold);
+    box-shadow: 0 0 7px 2px rgba(249,149,34,.65);
+    opacity: .9;
+    font-style: normal;
   }
 
+  /* ─── Scene (Boat + Waves) ──────────────────────────────────── */
   .lam-loader__scene {
-    position:relative; width:min(320px,90vw); height:180px; z-index:1;
+    position: relative;
+    width: min(340px, 92vw);
+    height: clamp(150px, 28vw, 200px);
+    z-index: 1;
   }
   .lam-loader__boat-anchor {
-    position:absolute; bottom:55px; left:50%; transform:translateX(-50%);
+    position: absolute;
+    bottom: clamp(48px, 8vw, 62px);
+    left: 50%;
+    transform: translateX(-50%);
   }
   .lam-loader__boat {
-    width:180px; height:auto;
-    animation:lk-boatBob 3.5s ease-in-out infinite;
-    transform-origin:center bottom;
-    filter:drop-shadow(0 6px 12px rgba(0,0,0,.4));
+    width: clamp(145px, 28vw, 195px);
+    height: auto;
+    animation: lk-boatBob 3.8s ease-in-out infinite;
+    transform-origin: center bottom;
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,.6)) drop-shadow(0 0 16px rgba(249,149,34,.18));
   }
   .lam-loader__sail {
-    animation:lk-sailFlutter 2.8s ease-in-out infinite;
-    transform-origin:left center;
+    animation: lk-sailFlutter 3s ease-in-out infinite;
+    transform-origin: left center;
   }
   .lam-loader__flag {
-    animation:lk-flagWave 1.8s ease-in-out infinite;
-    transform-origin:left center;
+    animation: lk-flagWave 2s ease-in-out infinite;
+    transform-origin: left center;
   }
 
+  /* ─── Waves ─────────────────────────────────────────────────── */
   .lam-loader__waves-wrap {
-    position:absolute; bottom:0; left:0; right:0; height:80px; overflow:hidden;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: clamp(62px, 12vw, 90px);
+    overflow: hidden;
   }
   .lam-wave-layer {
-    position:absolute; bottom:0; left:0; width:200%; height:100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
   }
-  .lam-wave-layer svg { width:100%; height:100%; }
-  .lam-wave-layer--back  { animation:lk-waveScroll 5s linear infinite; }
-  .lam-wave-layer--mid   { animation:lk-waveScroll 4s linear infinite; }
-  .lam-wave-layer--front { animation:lk-waveScroll 3s linear infinite; }
+  .lam-wave-layer svg { width: 100%; height: 100%; }
+  .lam-wave-layer--back  { animation: lk-waveScroll 5.5s linear infinite; }
+  .lam-wave-layer--mid   { animation: lk-waveScroll 4s linear infinite; }
+  .lam-wave-layer--front { animation: lk-waveScroll 2.8s linear infinite; }
 
+  /* ─── Footer (Progress) ─────────────────────────────────────── */
   .lam-loader__footer {
-    text-align:center; z-index:1; margin-top:8px; width:min(280px,80vw);
+    text-align: center;
+    z-index: 1;
+    width: min(300px, 84vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
   }
   .lam-loader__caption {
-    font-family:'Inter',sans-serif; font-size:.8rem;
-    color:var(--lk-cream); opacity:.8; margin-bottom:8px;
-    transition:opacity .22s ease; letter-spacing:.06em;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(.7rem, 1.3vw, .8rem);
+    color: var(--lk-cream-muted);
+    margin: 0;
+    transition: opacity .28s ease;
+    letter-spacing: .1em;
+    font-weight: 300;
   }
   .lam-loader__progress {
-    height:4px; background:rgba(255,255,255,.15); border-radius:4px;
-    overflow:hidden; margin-bottom:4px;
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,.09);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+  }
+  .lam-loader__progress::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.06) 50%, transparent 100%);
+    animation: lk-shimmer 2.2s linear infinite;
   }
   .lam-loader__progress-bar {
-    height:100%; width:0%;
-    background:linear-gradient(90deg,var(--lk-gold-deep),var(--lk-gold));
-    border-radius:4px; transition:width .16s ease-out;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--lk-gold-deep), var(--lk-gold), var(--lk-gold-bright));
+    border-radius: 99px;
+    transition: width .18s ease-out;
+    box-shadow: 0 0 9px 2px rgba(249,149,34,.55);
+    position: relative;
+    z-index: 1;
   }
   .lam-loader__percent {
-    font-size:11px; letter-spacing:.14em;
-    color:var(--lk-gold); opacity:.9;
-    font-family:'Inter',sans-serif;
+    font-size: clamp(9px, 1.1vw, 11px);
+    letter-spacing: .18em;
+    color: var(--lk-gold);
+    opacity: .85;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
   }
 
+  /* ─── Keyframes ─────────────────────────────────────────────── */
   @keyframes lk-boatBob {
-    0%,100%{ transform:translateY(0) rotate(-2.5deg); }
-    50%{ transform:translateY(-9px) rotate(2.5deg); }
+    0%,100% { transform: translateY(0) rotate(-2.5deg); }
+    50%     { transform: translateY(-10px) rotate(2.5deg); }
   }
   @keyframes lk-flagWave {
-    0%,100%{ transform:skewY(-10deg); }
-    50%{ transform:skewY(10deg); }
+    0%,100% { transform: skewY(-10deg); }
+    50%     { transform: skewY(10deg); }
   }
   @keyframes lk-sailFlutter {
-    0%,100%{ transform:scaleX(1) skewY(0deg); }
-    50%{ transform:scaleX(1.025) skewY(-1.2deg); }
+    0%,100% { transform: scaleX(1) skewY(0deg); }
+    50%     { transform: scaleX(1.03) skewY(-1.2deg); }
   }
   @keyframes lk-waveScroll {
-    from{ transform:translateX(0); }
-    to{ transform:translateX(-50%); }
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
   }
   @keyframes lk-twinkle {
-    0%,100%{ opacity:.15; }
-    50%{ opacity:.8; }
+    0%,100% { opacity: .12; transform: scale(.85); }
+    50%     { opacity: .92; transform: scale(1.25); }
+  }
+  @keyframes lk-orb-pulse {
+    0%,100% { opacity: .7;  transform: translate(-50%, -50%) scale(1); }
+    50%     { opacity: 1;   transform: translate(-50%, -50%) scale(1.09); }
+  }
+  @keyframes lk-shimmer {
+    from { transform: translateX(-120%); }
+    to   { transform: translateX(220%); }
   }
 
-  @media (prefers-reduced-motion:reduce){
-    .lam-loader__boat,.lam-loader__flag,.lam-loader__sail,
-    .lam-wave-layer,.lam-loader__stars span {
-      animation:none !important;
+  /* ─── Reduced Motion ────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .lam-loader__boat, .lam-loader__flag, .lam-loader__sail,
+    .lam-wave-layer, .lam-loader__stars span,
+    .lam-loader::before, .lam-loader__progress::after {
+      animation: none !important;
     }
   }
 </style>

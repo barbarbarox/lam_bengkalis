@@ -5,93 +5,551 @@
 @section('content')
 
 {{-- ══════════════════════════════════════════════════════════════
-     HERO: Background Carousel + Overlay Konten
+     HERO: Split Layout — Konten Kiri | Foto Kanan
 ════════════════════════════════════════════════════════════════ --}}
 <section
   id="hero"
+  class="hero-split"
   x-data="backgroundCarousel(window.lamSlidesData)"
-  style="position:relative;height:100svh;min-height:540px;max-height:900px;overflow:hidden;"
-  aria-label="Gambar latar beranda"
+  aria-label="Hero beranda Lembaga Adat Melayu"
 >
-  {{-- Slide images (crossfade) --}}
-  <div style="position:absolute;inset:0;" aria-hidden="true">
+
+  {{-- ── KOLOM KIRI: Konten & Motif Budaya ─────────────────────── --}}
+  <div class="hero-split__left">
+
+    {{-- Shield: wrapper overflow:hidden HANYA untuk dekorasi absolut (bukan konten teks) --}}
+    <div class="hero-split__deco-shield" aria-hidden="true">
+      {{-- Dekorasi: Border motif vertikal kiri --}}
+      <div class="hero-split__corak-border"></div>
+      {{-- Dekorasi: Watermark motif kuntum bujang --}}
+      <div class="hero-split__watermark"></div>
+    </div>
+
+    {{-- Konten utama --}}
+    <div class="hero-split__content">
+
+      {{-- Eyebrow / Sub-judul --}}
+      <p class="hero-split__eyebrow">Lembaga Resmi Pemerintah Daerah</p>
+
+      {{-- Judul Utama --}}
+      <h1 class="hero-split__title">
+        {{ $setting->nama_lembaga ?? 'Lembaga Adat Melayu Kabupaten Bengkalis' }}
+      </h1>
+
+      {{-- Divider motif kuntum bersanding --}}
+      <div class="hero-split__divider" aria-hidden="true">
+        <span class="hero-split__divider-line"></span>
+        <img
+          src="{{ asset('images/kuntum_bersanding.svg') }}"
+          alt=""
+          class="hero-split__divider-motif"
+          loading="eager"
+        >
+        <span class="hero-split__divider-line"></span>
+      </div>
+
+      {{-- Deskripsi --}}
+      <p class="hero-split__desc">
+        {{ $setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu (LAM) Kabupaten Bengkalis — menjaga dan melestarikan budaya, adat istiadat Melayu Riau di Kabupaten Bengkalis, Provinsi Riau.' }}
+      </p>
+
+      {{-- Tombol CTA --}}
+      <div class="hero-split__actions">
+        <a href="{{ route('profil') }}" class="hero-split__btn hero-split__btn--primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Profil Lembaga
+        </a>
+        <a href="{{ route('berita.index') }}" class="hero-split__btn hero-split__btn--outline">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+          Baca Berita
+        </a>
+      </div>
+
+    </div>{{-- /hero-split__content --}}
+
+    {{-- Dot indicators (di kiri bawah, desktop) --}}
+    @if($slides->count() > 1)
+      <div class="hero-split__dots" role="tablist" aria-label="Pilih slide foto">
+        @foreach($slides as $i => $slide)
+          <button
+            @click="goTo({{ $i }})"
+            class="hero-split__dot"
+            :class="{ 'is-active': currentSlide === {{ $i }} }"
+            role="tab"
+            :aria-selected="currentSlide === {{ $i }}"
+            :aria-label="'Slide ' + ({{ $i }} + 1)"
+          ></button>
+        @endforeach
+      </div>
+    @endif
+
+  </div>{{-- /hero-split__left --}}
+
+  {{-- ── KOLOM KANAN: Foto Carousel ────────────────────────────── --}}
+  <div class="hero-split__right" aria-hidden="true">
     @forelse($slides as $i => $slide)
       <div
-        style="position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 800ms ease;background-image:url('{{ Storage::url($slide->image_path) }}')"
+        class="hero-split__slide"
+        style="background-image:url('{{ Storage::url($slide->image_path) }}');z-index:0;"
         :style="{ opacity: currentSlide === {{ $i }} ? 1 : 0 }"
         role="img"
         :aria-label="slides[{{ $i }}]?.alt_text || ''"
       ></div>
     @empty
-      {{-- Fallback: gradien jika tidak ada slide --}}
-      <div style="position:absolute;inset:0;background:linear-gradient(135deg,var(--lam-green-d),var(--lam-green));"></div>
+      {{-- Fallback gradien jika tidak ada slide --}}
+      <div class="hero-split__slide" style="background:linear-gradient(135deg,var(--lam-green-d) 0%,#004d1a 100%);opacity:1;z-index:0;"></div>
     @endforelse
-  </div>
 
-  {{-- Overlay gelap --}}
-  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.5) 0%,rgba(0,0,0,.2) 50%,rgba(11,79,48,.85) 100%);" aria-hidden="true"></div>
+    {{-- Aura gradasi responsif: bawah gelap (mobile) / kiri gelap (desktop) — z-index:2 --}}
+    <div class="hero-split__aura"></div>
 
-  {{-- Konten tengah hero --}}
-  <div class="container" style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding-top:4rem;">
-    <div class="hero-box" style="position: relative; overflow: hidden; background: rgba(212, 160, 23, 0.75); backdrop-filter: blur(10px); padding: 4rem 3rem; border-radius: var(--radius); box-shadow: var(--lam-shadow); max-width: 800px;">
-      
-      {{-- SVG Borders --}}
-      <div style="position: absolute; top: 0; left: 0; right: 0; height: 32px; background: url('{{ asset('images/itik_pulang_petang.svg') }}') repeat-x center; background-size: auto 100%; opacity: 0.8;" aria-hidden="true"></div>
-      <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 32px; background: url('{{ asset('images/itik_pulang_petang.svg') }}') repeat-x center; background-size: auto 100%; opacity: 0.8; transform: rotate(180deg);" aria-hidden="true"></div>
-      
-      <p style="font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:var(--lam-black-d);font-weight:700;margin-bottom:1rem;position:relative;z-index:2;">
-        Lembaga Resmi Pemerintah Daerah
-      </p>
-      <h1 style="font-family:var(--font-head);font-size:clamp(2rem,5vw,3.5rem);color:var(--lam-black);font-weight:700;max-width:700px;line-height:1.2;margin-bottom:1.25rem;text-shadow:none;position:relative;z-index:2;">
-        {{ $setting->nama_lembaga ?? 'Lembaga Adat Melayu Kabupaten Bengkalis' }}
-      </h1>
-      <p style="color:var(--lam-black-l);max-width:540px;font-size:1.05rem;margin-bottom:2rem;margin-left:auto;margin-right:auto;font-weight:500;position:relative;z-index:2;">
-        {{ $setting->meta_deskripsi ?? 'Menjaga, melestarikan, dan mengembangkan adat budaya Melayu di Kabupaten Bengkalis.' }}
-      </p>
-      <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;position:relative;z-index:2;">
-        <a href="{{ route('profil') }}" class="btn hero-btn-primary" style="background:var(--lam-gold); color:var(--lam-black); border:2px solid var(--lam-gold); font-weight:700; transition:all 0.3s ease;">Profil Lembaga</a>
-        <a href="{{ route('berita.index') }}" class="btn hero-btn-outline" style="background:transparent; border:2px solid rgba(255,255,255,0.7); color:#fff; font-weight:600; transition:all 0.3s ease;">Baca Berita</a>
-      </div>
-    </div>
-  </div>
+    {{-- Ornamen sudut sudut kiri bawah — di atas aura (z-index:3) --}}
+    <img
+      src="{{ asset('images/motif-kiri.svg') }}"
+      class="hero-split__photo-corner hero-split__photo-corner--bl"
+      alt=""
+      aria-hidden="true"
+    >
 
-  {{-- Dot indicators --}}
-  @if($slides->count() > 1)
-    <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;z-index:3;" role="tablist" aria-label="Pilih slide">
-      @foreach($slides as $i => $slide)
-        <button
-          @click="goTo({{ $i }})"
-          :class="currentSlide === {{ $i }} ? 'is-active' : ''"
-          style="width:8px;height:8px;border-radius:50%;border:none;background:rgba(255,255,255,.4);cursor:pointer;transition:background .3s,width .3s,border-radius .3s;"
-          :style="{ background: currentSlide === {{ $i }} ? 'var(--lam-gold)' : 'rgba(255,255,255,.4)', width: currentSlide === {{ $i }} ? '24px' : '8px', borderRadius: currentSlide === {{ $i }} ? '4px' : '50%' }"
-          role="tab" :aria-selected="currentSlide === {{ $i }}"
-          :aria-label="'Slide ' + ({{ $i }} + 1)"
-        ></button>
-      @endforeach
-    </div>
-  @endif
+    {{-- Ornamen sudut kanan bawah — di atas aura (z-index:3) --}}
+    <img
+      src="{{ asset('images/motif-kanan.svg') }}"
+      class="hero-split__photo-corner hero-split__photo-corner--br"
+      alt=""
+      aria-hidden="true"
+    >
 
-  {{-- Scroll cue --}}
-  <a href="#sambutan" style="position:absolute;bottom:3.5rem;right:2rem;z-index:3;color:rgba(255,255,255,.5);animation:bounce 2s infinite;" aria-label="Gulir ke bawah">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-  </a>
+    {{-- Scroll cue --}}
+    <a href="#sambutan" class="hero-split__scroll-cue" aria-label="Gulir ke bawah">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </a>
+  </div>{{-- /hero-split__right --}}
+
 </section>
 
 <style>
-  @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(6px);} }
-  @media (prefers-reduced-motion:reduce){
-    [x-data*="backgroundCarousel"] div[style*="transition"] { transition:none !important; }
+/* ─── Hero Split Layout ─────────────────────────────────────── */
+
+/* Wrapper utama: Flexbox row di desktop, column di mobile */
+#hero.hero-split {
+  display: flex;
+  flex-direction: row;          /* desktop: side by side */
+  height: 85vh;                 /* Batasi tinggi layar */
+  max-height: 700px;
+  min-height: 600px;
+  /* TIDAK ada overflow:hidden di sini — agar konten teks tidak terpotong */
+  position: relative;
+}
+
+/* ── Kolom Kiri (Konten) ── */
+.hero-split__left {
+  position: relative;
+  /* TIDAK overflow:hidden — dekorasi absolut dikelola di deco-shield */
+  background: #0f172a;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 0 0 40%;           /* 40% lebar di desktop */
+  height: 100%;
+  z-index: 1;
+}
+
+/* Shield: overflow:hidden HANYA untuk dekorasi absolut */
+.hero-split__deco-shield {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;        /* clip dekorasi — tidak pengaruhi konten teks */
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Border motif vertikal kiri */
+.hero-split__corak-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 44px;
+  background: url('{{ asset('images/corak.svg') }}') repeat-y left top;
+  background-size: 44px auto;
+  opacity: 0.45;
+}
+
+/* Watermark kuntum bujang */
+.hero-split__watermark {
+  position: absolute;
+  inset: 0;
+  background: url('{{ asset('images/kuntum-bujang.svg') }}') no-repeat center center;
+  background-size: 85%;
+  opacity: 0.07;
+}
+
+/* Konten dalam kolom kiri — z-index lebih tinggi dari shield */
+.hero-split__content {
+  position: relative;
+  z-index: 2;              /* di atas deco-shield */
+  padding: 5rem 3.5rem 4rem 4.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Ornamen sudut di kolom foto */
+.hero-split__photo-corner {
+  position: absolute;
+  bottom: 1rem;
+  width: 140px;
+  height: auto;
+  z-index: 3;              /* di atas aura (z:2), di bawah scroll-cue (z:4) */
+  pointer-events: none;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+.hero-split__photo-corner--bl {
+  left: 0;
+}
+.hero-split__photo-corner--br {
+  right: 0;
+}
+
+/* Eyebrow */
+.hero-split__eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #d4af37;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Judul */
+.hero-split__title {
+  font-family: var(--font-head);
+  font-size: clamp(1.8rem, 3.2vw, 3rem);
+  font-weight: 700;
+  color: #f0d060;
+  line-height: 1.2;
+  margin: 0;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+/* Divider motif */
+.hero-split__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.hero-split__divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(212,175,55,0.6), transparent);
+}
+.hero-split__divider-motif {
+  height: 36px;
+  width: auto;
+  flex-shrink: 0;
+  filter: brightness(0) saturate(100%) invert(82%) sepia(36%) saturate(400%) hue-rotate(2deg) brightness(105%);
+  opacity: 0.9;
+}
+
+/* Deskripsi */
+.hero-split__desc {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: rgba(240,240,240,0.78);
+  line-height: 1.85;
+  margin: 0;
+  max-width: 420px;
+}
+
+/* Tombol */
+.hero-split__actions {
+  display: flex;
+  gap: 0.875rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.hero-split__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.hero-split__btn--primary {
+  background: #d4af37;
+  color: #0f172a;
+  border: 2px solid #d4af37;
+  box-shadow: 0 4px 20px rgba(212,175,55,0.35);
+}
+.hero-split__btn--primary:hover {
+  background: #e8c44a;
+  border-color: #e8c44a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(212,175,55,0.5);
+}
+
+.hero-split__btn--outline {
+  background: transparent;
+  color: rgba(255,255,255,0.85);
+  border: 1.5px solid rgba(255,255,255,0.35);
+}
+.hero-split__btn--outline:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.65);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Dot indicators */
+.hero-split__dots {
+  position: absolute;
+  bottom: 2rem;
+  left: 4.5rem;
+  display: flex;
+  gap: 0.4rem;
+  z-index: 3;
+}
+.hero-split__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.25);
+  cursor: pointer;
+  transition: background 0.3s, width 0.3s, border-radius 0.3s;
+  padding: 0;
+}
+.hero-split__dot.is-active {
+  background: #d4af37;
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ── Kolom Kanan (Foto) ── */
+.hero-split__right {
+  position: relative;
+  overflow: hidden;        /* clip foto — aman karena tidak ada teks di sini */
+  flex: 1;                 /* ambil sisa lebar (60%) di desktop */
+  height: 100%;
+  width: 100%;
+}
+
+/* Slide foto */
+.hero-split__slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center bottom;
+  transition: opacity 900ms ease;
+  opacity: 0;
+}
+
+/* Aura gradasi responsif:
+   Desktop → gelap dari kiri (menyatu dengan panel kiri), memudar ke kanan
+   Mobile  → gelap dari bawah (menyatu dengan panel teks di bawah), memudar ke atas
+*/
+.hero-split__aura {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  /* Desktop default: kiri ke kanan */
+  background: linear-gradient(
+    to right,
+    #0f172a 0%,
+    rgba(15,23,42,0.7) 18%,
+    rgba(15,23,42,0.2) 38%,
+    transparent 58%
+  );
+}
+
+/* Scroll cue */
+.hero-split__scroll-cue {
+  position: absolute;
+  bottom: 2rem;
+  right: 1.5rem;
+  z-index: 2;
+  color: rgba(255,255,255,0.5);
+  animation: hero-bounce 2s infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.2);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: color 0.3s, background 0.3s;
+}
+.hero-split__scroll-cue:hover {
+  color: #d4af37;
+  background: rgba(0,0,0,0.35);
+}
+
+@keyframes hero-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(6px); }
+}
+
+/* ── Responsive: Tablet (1024px) ── */
+@media (max-width: 1024px) {
+  .hero-split__left  { flex: 0 0 45%; }
+  .hero-split__content {
+    padding: 4rem 2.5rem 3.5rem 3.5rem;
   }
-  .hero-btn-primary:hover {
-    background: #e5871b !important; /* Slightly darker gold/yellow */
-    border-color: #e5871b !important;
-    transform: translateY(-2px);
+  /* Scroll cue z-index lebih tinggi dari motif sudut */
+  .hero-split__scroll-cue {
+    z-index: 4;
   }
-  .hero-btn-outline:hover {
-    background: rgba(255,255,255,0.15) !important;
-    border-color: #fff !important;
-    transform: translateY(-2px);
+
+  /* Kecilkan ornamen sudut foto di tablet */
+  .hero-split__photo-corner {
+    width: 90px;
   }
+}
+
+/* ── Responsive: Mobile (≤768px) ── */
+@media (max-width: 768px) {
+  /* Ubah ke kolom vertikal — foto di atas, teks di bawah */
+  #hero.hero-split {
+    flex-direction: column;  /* stack vertikal */
+    height: auto;            /* w-full h-auto: Hapus tinggi tetap desktop 85vh */
+    max-height: none;
+    min-height: 0;
+  }
+
+  /* Kolom kiri (teks) pindah ke bawah */
+  .hero-split__left {
+    order: 2;
+    flex: none;              /* hapus flex-basis 40% */
+    width: 100%;
+    height: auto;            /* h-auto: Hapus height 100% dari desktop */
+    padding-bottom: 3rem;    /* pb-12: Padding bawah agar dark bg berhenti setelah dots */
+    justify-content: flex-start;
+  }
+
+  /* Kolom kanan (foto) pindah ke atas, tinggi eksplisit */
+  .hero-split__right {
+    order: 1;
+    flex: none;
+    flex-shrink: 0;          /* shrink-0: Mencegah container menyusut tergencet konten bawah */
+    width: 100%;
+    height: 35vh;            /* h-[35vh] */
+    min-height: 288px;       /* h-72 */
+  }
+
+  /* Konten teks: padding atas cukup, gap wajar */
+  .hero-split__content {
+    padding: 3.5rem 1.5rem 2.25rem 2.5rem;
+    gap: 1.1rem;
+  }
+
+  .hero-split__corak-border {
+    width: 28px;
+    background-size: 28px auto;
+  }
+
+  .hero-split__eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+  }
+
+  .hero-split__title {
+    font-size: clamp(1.4rem, 5.5vw, 1.9rem);
+  }
+
+  .hero-split__desc {
+    font-size: 0.83rem;
+    max-width: 100%;
+  }
+
+  /* Layout tombol berdampingan khusus mobile */
+  .hero-split__actions {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 100%;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .hero-split__btn {
+    flex: 1;
+    justify-content: center;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  /* Dots tetap di atas kolom kiri (bawah kiri area teks) */
+  .hero-split__dots {
+    position: static;
+    padding: 0 0 1.25rem 2.5rem;
+    margin-top: -0.5rem;
+  }
+
+  /* Aura: mobile → gradasi dari bawah ke atas (foto atas ≠> teks bawah) */
+  .hero-split__aura {
+    background: linear-gradient(
+      to top,
+      #0f172a 0%,
+      rgba(15,23,42,0.60) 50%,
+      transparent 100%
+    );
+  }
+
+  /* Kecilkan ornamen sudut foto di mobile */
+  .hero-split__photo-corner {
+    width: 72px;
+  }
+
+  .hero-split__scroll-cue {
+    display: none;
+  }
+}
+
+/* ── Responsive: HP Kecil (≤480px) ── */
+@media (max-width: 480px) {
+  .hero-split__right {
+    height: 35vh;
+    min-height: 250px;
+  }
+
+  .hero-split__content {
+    padding: 2.5rem 1rem 1.75rem 1.75rem;
+    gap: 0.9rem;
+  }
+
+  .hero-split__divider-motif {
+    height: 26px;
+  }
+  .hero-split__dots {
+    padding-left: 1.75rem;
+  }
+
+  /* Ornamen lebih kecil di HP sempit */
+  .hero-split__photo-corner {
+    width: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-split__slide { transition: none !important; }
+  .hero-split__scroll-cue { animation: none !important; }
+}
 </style>
 
 {{-- ══════════════════════════════════════════════════════════════
