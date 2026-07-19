@@ -28,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
             'app.admin_session_timeout' => (int) env('ADMIN_SESSION_TIMEOUT', 30),
         ]);
 
+        // Paksa skema HTTPS di production (mengatasi isu canonical & sitemap jika menggunakan Cloudflare)
+        if (config('app.env') === 'production' || request()->header('x-forwarded-proto') === 'https' || str_contains(config('app.url'), 'https://')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         // Bagikan data global ke semua views yang menggunakan layouts.app
         // Ini memungkinkan navbar menampilkan daftar Layanan di semua halaman
         View::composer('layouts.app', function ($view) {

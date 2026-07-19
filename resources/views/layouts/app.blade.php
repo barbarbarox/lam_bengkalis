@@ -275,6 +275,19 @@
       animation: dropFade .15s ease;
     }
     .navbar__dropdown.is-open .navbar__dropdown-menu { display: block; }
+    /* Elemen pseudo transparan untuk menutup celah hover (gap) agar dropdown tidak langsung tertutup */
+    .navbar__dropdown::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      height: 1.5rem;
+      display: none;
+    }
+    .navbar__dropdown.is-open::after {
+      display: block;
+    }
     @keyframes dropFade { from { opacity:0; transform: translateX(-50%) translateY(-6px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
     .navbar__dropdown-item {
       display: flex; align-items: center; gap: .65rem;
