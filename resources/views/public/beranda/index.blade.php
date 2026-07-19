@@ -106,48 +106,99 @@
       <div class="section-heading__divider"><span></span><i></i><span></span></div>
     </div>
 
-    <div class="layanan-container">
-      <div class="layanan-scroll-wrapper">
-        @foreach($layanans as $idx => $layanan)
-          @php
-            $warna = $layanan->warna ?: '#F99522';
-            $accents = ['#F99522', '#008000', '#EB2D3A', '#FFC90E', '#009900'];
-            $accent = $warna !== '#F99522' ? $warna : ($accents[$idx % count($accents)] ?? '#F99522');
-            $isExt = $layanan->url && (str_starts_with($layanan->url,'http://') || str_starts_with($layanan->url,'https://'));
-          @endphp
-          
-          <a href="{{ $layanan->url ?? '#' }}" 
-             class="layanan-box" 
-             style="--accent: {{ $accent }};"
-             @if($isExt) target="_blank" rel="noopener noreferrer" @endif>
+    <div class="layanan-outer" id="layananOuter">
+      {{-- Panah Kiri --}}
+      <button class="layanan-arrow layanan-arrow--left" id="layananPrev"
+              onclick="layananScroll(-1)" aria-label="Geser kiri" style="display:none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+             stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+
+      <div class="layanan-container" id="layananScroll">
+        <div class="layanan-scroll-wrapper">
+          @foreach($layanans as $idx => $layanan)
+            @php
+              $warna = $layanan->warna ?: '#F99522';
+              $accents = ['#F99522', '#008000', '#EB2D3A', '#FFC90E', '#009900'];
+              $accent = $warna !== '#F99522' ? $warna : ($accents[$idx % count($accents)] ?? '#F99522');
+              $isExt = $layanan->url && (str_starts_with($layanan->url,'http://') || str_starts_with($layanan->url,'https://'));
+            @endphp
             
-            <div class="layanan-box__icon-wrapper">
-              @if($layanan->jenis_icon === 'image' && $layanan->image)
-                <img src="{{ Storage::url($layanan->image) }}" alt="{{ $layanan->nama }}" class="layanan-box__img" loading="lazy">
-              @elseif($layanan->icon)
-                <x-dynamic-component :component="$layanan->icon" class="layanan-box__icon-svg" aria-hidden="true" />
-              @else
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="layanan-box__icon-svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-              @endif
-            </div>
-            
-            <span class="layanan-box__title">{{ $layanan->nama }}</span>
-          </a>
-        @endforeach
+            <a href="{{ $layanan->url ?? '#' }}" 
+               class="layanan-box" 
+               style="--accent: {{ $accent }};"
+               @if($isExt) target="_blank" rel="noopener noreferrer" @endif>
+              
+              <div class="layanan-box__icon-wrapper">
+                @if($layanan->jenis_icon === 'image' && $layanan->image)
+                  <img src="{{ Storage::url($layanan->image) }}" alt="{{ $layanan->nama }}" class="layanan-box__img" loading="lazy">
+                @elseif($layanan->icon)
+                  <x-dynamic-component :component="$layanan->icon" class="layanan-box__icon-svg" aria-hidden="true" />
+                @else
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="layanan-box__icon-svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                @endif
+              </div>
+              
+              <span class="layanan-box__title">{{ $layanan->nama }}</span>
+            </a>
+          @endforeach
+        </div>
       </div>
+
+      {{-- Panah Kanan --}}
+      <button class="layanan-arrow layanan-arrow--right" id="layananNext"
+              onclick="layananScroll(1)" aria-label="Geser kanan">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+             stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
     </div>
   </div>
 </section>
 
 <style>
+  /* ─── Layanan: Outer Wrapper + Arrows ──────────────────────── */
+  .layanan-outer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Panah Navigasi */
+  .layanan-arrow {
+    flex-shrink: 0;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(249,149,34,.45);
+    background: rgba(249,149,34,.08);
+    color: var(--lam-gold);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease, transform .15s ease, opacity .25s ease;
+    z-index: 2;
+    outline: none;
+  }
+  .layanan-arrow:hover {
+    background: rgba(249,149,34,.22);
+    border-color: var(--lam-gold);
+    transform: scale(1.1);
+  }
+  .layanan-arrow:active { transform: scale(.95); }
+  .layanan-arrow[style*="display:none"],
+  .layanan-arrow[style*="display: none"] { opacity: 0; pointer-events: none; }
+
   .layanan-container {
-    width: 100%;
+    flex: 1;
     overflow: hidden;
-    /* Optional: fade effect on edges */
-    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    /* Fade edges saat panah ada */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+    mask-image:         linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
   }
   
   .layanan-scroll-wrapper {
@@ -155,16 +206,14 @@
     flex-wrap: nowrap;
     overflow-x: auto;
     gap: 1.5rem;
-    padding: 1rem 10%;
+    padding: 1rem 4%;
     /* Hide scrollbar */
     -ms-overflow-style: none;
     scrollbar-width: none;
     scroll-behavior: smooth;
     align-items: flex-start;
   }
-  .layanan-scroll-wrapper::-webkit-scrollbar {
-    display: none;
-  }
+  .layanan-scroll-wrapper::-webkit-scrollbar { display: none; }
   
   .layanan-box {
     display: flex;
@@ -176,83 +225,80 @@
     max-width: 110px;
     transition: transform 0.2s ease;
   }
-  
-  .layanan-box:hover {
-    transform: translateY(-4px);
-  }
+  .layanan-box:hover { transform: translateY(-4px); }
   
   .layanan-box__icon-wrapper {
-    width: 64px;
-    height: 64px;
+    width: 64px; height: 64px;
     background: var(--lam-black-l);
     border: 1px solid rgba(255,255,255,0.05);
     border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     color: var(--accent);
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
     overflow: hidden;
   }
-  
   .layanan-box:hover .layanan-box__icon-wrapper {
     background: color-mix(in srgb, var(--accent) 15%, var(--lam-black-l));
     border-color: color-mix(in srgb, var(--accent) 30%, transparent);
     box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px var(--accent) inset;
   }
-  
-  .layanan-box__icon-svg {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .layanan-box__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
+  .layanan-box__icon-svg { width: 32px; height: 32px; }
+  .layanan-box__img { width: 100%; height: 100%; object-fit: cover; }
   .layanan-box__title {
-    font-family: var(--font-sans);
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #F5F5F5;
-    text-align: center;
+    font-family: var(--font-body);
+    font-size: 0.85rem; font-weight: 500;
+    color: #F5F5F5; text-align: center;
     line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     transition: color 0.3s ease;
   }
-  
-  .layanan-box:hover .layanan-box__title {
-    color: var(--accent);
-  }
+  .layanan-box:hover .layanan-box__title { color: var(--accent); }
   
   @media (max-width: 768px) {
-    .layanan-scroll-wrapper {
-      padding: 1rem 5%;
-      gap: 1rem;
-    }
-    .layanan-box {
-      min-width: 80px;
-    }
-    .layanan-box__icon-wrapper {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-    }
-    .layanan-box__icon-svg {
-      width: 28px;
-      height: 28px;
-    }
-    .layanan-box__title {
-      font-size: 0.75rem;
-    }
+    .layanan-outer { gap: .25rem; }
+    .layanan-arrow { width: 36px; height: 36px; }
+    .layanan-scroll-wrapper { padding: 1rem 3%; gap: 1rem; }
+    .layanan-box { min-width: 80px; }
+    .layanan-box__icon-wrapper { width: 56px; height: 56px; border-radius: 14px; }
+    .layanan-box__icon-svg { width: 28px; height: 28px; }
+    .layanan-box__title { font-size: 0.75rem; }
   }
 </style>
+
+<script>
+  (function () {
+    const SCROLL_AMOUNT = 260;
+
+    function layananUpdateArrows() {
+      var el = document.getElementById('layananScroll');
+      var prev = document.getElementById('layananPrev');
+      var next = document.getElementById('layananNext');
+      if (!el || !prev || !next) return;
+
+      var atStart = el.scrollLeft <= 4;
+      var atEnd   = el.scrollLeft >= (el.scrollWidth - el.clientWidth - 4);
+
+      prev.style.display = atStart ? 'none' : 'flex';
+      next.style.display = atEnd   ? 'none' : 'flex';
+    }
+
+    window.layananScroll = function (dir) {
+      var el = document.getElementById('layananScroll');
+      if (!el) return;
+      el.scrollBy({ left: dir * SCROLL_AMOUNT, behavior: 'smooth' });
+      setTimeout(layananUpdateArrows, 350);
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var el = document.getElementById('layananScroll');
+      if (!el) return;
+      layananUpdateArrows();
+      el.addEventListener('scroll', layananUpdateArrows, { passive: true });
+      window.addEventListener('resize', layananUpdateArrows);
+    });
+  })();
+</script>
 @endif
 
 
