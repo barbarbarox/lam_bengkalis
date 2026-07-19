@@ -529,23 +529,27 @@
   }
   .scroll-section { scroll-margin-top: 140px; }
 
-  /* Timeline Styles */
+  /* ─── Timeline Styles ──────────────────────────────────────── */
   .timeline-container {
     position: relative;
     max-width: 900px;
     margin: 0 auto;
     padding: 2rem 0;
   }
+  /* Garis tengah timeline */
   .timeline-container::after {
     content: '';
     position: absolute;
-    width: 4px;
-    background-color: var(--lam-gold);
+    width: 3px;
+    background: linear-gradient(to bottom, var(--lam-gold-d), var(--lam-gold), var(--lam-gold-d));
     top: 0;
     bottom: 0;
     left: 50%;
-    margin-left: -2px;
+    margin-left: -1.5px;
+    border-radius: 2px;
   }
+
+  /* ─── Timeline Item ─────────────────────────────────────────── */
   .timeline-item {
     padding: 10px 40px;
     position: relative;
@@ -554,33 +558,74 @@
     opacity: 0;
     transform: translateY(40px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    z-index: 1;
   }
   .timeline-item.show {
     opacity: 1;
     transform: translateY(0);
   }
-  .timeline-left { left: 0; }
+  .timeline-left  { left: 0; }
   .timeline-right { left: 50%; }
+
+  /* ─── Titik Penanda — Pulsing Dot ───────────────────────────── */
   .timeline-item::after {
     content: '';
     position: absolute;
-    width: 24px;
-    height: 24px;
-    right: -12px;
-    background-color: white;
-    border: 4px solid var(--lam-gold);
-    top: 24px;
+    width: 20px;
+    height: 20px;
+    right: -10px;
+    background: radial-gradient(circle, #fff 40%, var(--lam-gold) 100%);
+    border: 3px solid var(--lam-gold);
+    top: 26px;
     border-radius: 50%;
-    z-index: 1;
+    z-index: 2;
+    /* Pulse animation */
+    animation: tl-dot-pulse 2.4s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(249,149,34,.75);
   }
-  .timeline-right::after { left: -12px; }
+  .timeline-right::after { left: -10px; right: auto; }
+
+  /* Inner glow shimmer on dot */
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    right: -4px;
+    top: 32px;
+    border-radius: 50%;
+    background: var(--lam-gold);
+    z-index: 3;
+    opacity: .85;
+    animation: tl-dot-inner 2.4s ease-in-out infinite;
+  }
+  .timeline-right::before { left: -4px; right: auto; }
+
+  @keyframes tl-dot-pulse {
+    0%   { box-shadow: 0 0 0 0   rgba(249,149,34,.75); }
+    50%  { box-shadow: 0 0 0 10px rgba(249,149,34,0);  }
+    100% { box-shadow: 0 0 0 0   rgba(249,149,34,0);   }
+  }
+  @keyframes tl-dot-inner {
+    0%,100% { transform: scale(1);    opacity: .85; }
+    50%      { transform: scale(1.35); opacity: 1;   }
+  }
+
+  /* ─── Kotak Timeline Content ────────────────────────────────── */
   .timeline-content {
     padding: 1.5rem;
     background-color: white;
-    border: 2px solid var(--lam-gold);
+    border: 2px solid rgba(249,149,34,.4);
     position: relative;
     border-radius: var(--radius);
     box-shadow: var(--lam-shadow);
+    transition:
+      transform .35s cubic-bezier(.34,1.56,.64,1),
+      box-shadow .35s ease,
+      border-color .35s ease;
+    cursor: default;
+    /* Stacking context */
+    isolation: isolate;
   }
   .timeline-content h3 {
     margin-top: 0;
@@ -589,11 +634,42 @@
     font-size: 1.5rem;
     margin-bottom: 1rem;
   }
-  .timeline-content .prose-konten, 
+  .timeline-content .prose-konten,
   .timeline-content .prose-konten p,
   .timeline-content .prose-konten li {
     color: var(--lam-black-l);
   }
+
+  /* Hover: card naik & tajam di atas overlay blur */
+  .timeline-content:hover {
+    transform: translateY(-6px) scale(1.025);
+    box-shadow:
+      0 32px 64px rgba(249,149,34,.22),
+      0 12px 28px rgba(0,0,0,.25);
+    border-color: var(--lam-gold);
+  }
+  /* Elevasi item yang di-hover di atas overlay */
+  .timeline-item:has(.timeline-content:hover) {
+    z-index: 500;
+  }
+
+  /* ─── Blur Overlay (full-screen, CSS :has) ──────────────────── */
+  #timeline-blur-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 5, .45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+  }
+  /* Aktif saat ada .timeline-content yang di-hover */
+  html:has(.timeline-content:hover) #timeline-blur-overlay {
+    opacity: 1;
+  }
+
   .timeline-img {
     width: 100%;
     max-height: 250px;
@@ -601,21 +677,27 @@
     border-radius: var(--radius-sm);
     margin-bottom: 1.25rem;
   }
+
+  /* ─── Responsive ─────────────────────────────────────────────── */
   @media screen and (max-width: 768px) {
-    /* Tetap selang-seling: shrink padding and content */
-    .timeline-item { 
-      padding: 10px 10px; 
+    .timeline-item {
+      padding: 10px 10px;
     }
     .timeline-item::after {
-      width: 16px;
-      height: 16px;
-      right: -8px;
-      top: 15px;
-      border-width: 3px;
+      width: 14px;
+      height: 14px;
+      right: -7px;
+      top: 16px;
+      border-width: 2.5px;
     }
-    .timeline-right::after { 
-      left: -8px; 
+    .timeline-item::before {
+      width: 6px;
+      height: 6px;
+      right: -3px;
+      top: 20px;
     }
+    .timeline-right::after { left: -7px; right: auto; }
+    .timeline-right::before { left: -3px; right: auto; }
     .timeline-content {
       padding: 0.75rem;
     }
@@ -632,11 +714,25 @@
     }
     .timeline-content .prose-konten p,
     .timeline-content .prose-konten li {
-      text-align: left; /* Menghindari spasi berantakan akibat justify di kolom sempit */
+      text-align: left;
     }
     .radio-inputs { justify-content: flex-start; padding: 0.5rem 1rem 0; }
   }
+
+  /* Reduced motion — matikan animasi dot */
+  @media (prefers-reduced-motion: reduce) {
+    .timeline-item::after,
+    .timeline-item::before {
+      animation: none !important;
+    }
+    .timeline-content:hover {
+      transform: none;
+    }
+  }
 </style>
+
+{{-- Full-screen blur overlay (diaktifkan via CSS :has saat timeline-content di-hover) --}}
+<div id="timeline-blur-overlay" aria-hidden="true"></div>
 
 @endsection
 
