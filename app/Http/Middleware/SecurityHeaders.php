@@ -27,7 +27,7 @@ class SecurityHeaders
         'Permissions-Policy'        => 'camera=(), microphone=(), geolocation=()',
         'Content-Security-Policy'   => "default-src 'self'; "
             . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://fonts.googleapis.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com; "
-            . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net; "
+            . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://cdn.jsdelivr.net; "
             . "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net; "
             . "img-src 'self' data: blob: https:; "
             . "frame-src https://www.google.com; "
@@ -63,7 +63,7 @@ class SecurityHeaders
                 // mungkin masih http:// di server (tergantung konfigurasi hosting).
                 $adminCsp = "default-src 'self'; "
                     . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com https://static.cloudflareinsights.com; "
-                    . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net; "
+                    . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://cdn.jsdelivr.net; "
                     . "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net; "
                     . "img-src 'self' data: blob: http: https:; "
                     . "frame-src 'self' https://www.google.com; "

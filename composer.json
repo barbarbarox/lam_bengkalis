@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "amidesfahani/filament-tinyeditor": "^3.0",
         "awcodes/filament-tiptap-editor": "^3.5",
         "filament/filament": "^3.3",
         "guava/filament-icon-picker": "^2.3",
@@ -16,6 +17,7 @@
         "mews/purifier": "^3.4",
         "owenvoke/blade-fontawesome": "^3.3",
         "phpoffice/phpword": "^1.4",
+        "smalot/pdfparser": "^2.12",
         "spatie/laravel-medialibrary": "^11.23",
         "spatie/laravel-permission": "^8.3"
     },

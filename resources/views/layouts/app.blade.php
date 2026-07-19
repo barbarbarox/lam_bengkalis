@@ -1067,5 +1067,8 @@
 </script>
 
 @stack('body_scripts')
+
+{{-- Development Popup --}}
+<x-development-popup />
 </body>
 </html>

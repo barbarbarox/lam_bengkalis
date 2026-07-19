@@ -93,7 +93,7 @@
             <div style="font-size:0.9rem;color:var(--lam-text-l);margin-bottom:1rem;font-weight:600;">
               Lanjut ke halaman:
             </div>
-            {{ $paginator->links() }}
+            {{ $paginator->links('vendor.pagination.lam') }}
           </div>
           @endif
 

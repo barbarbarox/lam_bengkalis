@@ -5,8 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BeritaResource\Pages;
 use App\Models\Berita;
 use App\Models\BeritaKategori;
-use FilamentTiptapEditor\TiptapEditor;
-use FilamentTiptapEditor\Enums\TiptapOutput;
+
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
@@ -79,6 +78,7 @@ class BeritaResource extends Resource
                         ->options([
                             'manual' => 'Buat Manual (Ketik Sendiri)',
                             'word'   => 'Import dari File Word (.docx)',
+                            'pdf'    => 'Import dari File PDF (.pdf)',
                         ])
                         ->default('manual')
                         ->inline()
@@ -87,19 +87,18 @@ class BeritaResource extends Resource
                         ->columnSpanFull(),
 
                     // ── Mode: Buat Manual ────────────────────────────────────
-                    TiptapEditor::make('konten')
+                    \AmidEsfahani\FilamentTinyEditor\TinyEditor::make('konten')
                         ->label('Isi Berita')
                         ->required(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'edit' || $get('input_mode') === 'manual')
-                        ->output(TiptapOutput::Html)
+                        ->fileAttachmentsDisk('public')
+                        ->fileAttachmentsVisibility('public')
+                        ->fileAttachmentsDirectory('berita/lampiran')
                         ->profile('default')
-                        ->disk('public')
-                        ->directory('berita/lampiran')
-                        ->maxContentWidth('full')
                         ->columnSpanFull()
                         ->extraInputAttributes([
                             'style' => 'min-height: 400px;',
                         ])
-                        ->hidden(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'create' && $get('input_mode') === 'word'),
+                        ->hidden(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'create' && in_array($get('input_mode'), ['word', 'pdf'])),
 
                     // ── Mode: Import Word ────────────────────────────────────
                     FileUpload::make('word_file')
@@ -113,30 +112,51 @@ class BeritaResource extends Resource
                         ])
                         ->maxSize(10240) // 10 MB
                         ->storeFileNamesIn('word_file_original_name')
-                        ->helperText(
-                            'Upload file .docx (maks. 10 MB). ' .
-                            'Klik Simpan untuk memproses dan mengisi konten secara otomatis.'
-                        )
+                        ->helperText('Upload file .docx (maks. 10 MB).')
                         ->required(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'create' && $get('input_mode') === 'word')
-                        ->hidden(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'edit' || $get('input_mode') === 'manual')
+                        ->hidden(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'edit' || $get('input_mode') !== 'word')
                         ->columnSpanFull(),
 
-                    Placeholder::make('word_import_info')
+                    // ── Mode: Import PDF ─────────────────────────────────────
+                    FileUpload::make('pdf_file')
+                        ->label('Upload File PDF (.pdf)')
+                        ->disk('public')
+                        ->directory('temp/pdf-import')
+                        ->visibility('private')
+                        ->acceptedFileTypes([
+                            'application/pdf',
+                        ])
+                        ->maxSize(10240) // 10 MB
+                        ->storeFileNamesIn('pdf_file_original_name')
+                        ->helperText('Upload file .pdf (maks. 10 MB).')
+                        ->required(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'create' && $get('input_mode') === 'pdf')
+                        ->hidden(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'edit' || $get('input_mode') !== 'pdf')
+                        ->columnSpanFull(),
+
+                    // ── Peringatan (Warning) untuk Word & PDF ────────────────
+                    Placeholder::make('import_warning')
                         ->label('')
-                        ->content(new HtmlString(
-                            '<div class="rounded-xl border border-primary-200 bg-primary-50 p-4 text-sm text-primary-900 dark:border-primary-800 dark:bg-primary-950 dark:text-primary-200">' .
-                            '<p class="font-semibold mb-2">📌 Cara Kerja Import Word:</p>' .
+                        ->content(fn (\Filament\Forms\Get $get) => new HtmlString(
+                            '<div class="rounded-xl border border-warning-200 bg-warning-50 p-4 text-sm text-warning-900 dark:border-warning-800 dark:bg-warning-950 dark:text-warning-200">' .
+                            '<div class="flex items-start gap-3">' .
+                            '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-warning-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>' .
+                            '<div>' .
+                            '<p class="font-bold mb-1">⚠️ PERINGATAN PENTING SETELAH IMPORT!</p>' .
+                            '<p class="mb-2">Harap <strong>segera cek dan edit kembali</strong> artikel ini setelah tersimpan. Tergantung pada format file dokumen asli:</p>' .
                             '<ul class="list-disc list-inside space-y-1">' .
-                            '<li>Format didukung: <strong>.docx</strong> (Microsoft Word 2007 atau lebih baru)</li>' .
-                            '<li>Heading (H1–H6), paragraf, <strong>bold</strong>, <em>italic</em>, <u>underline</u> dikonversi otomatis</li>' .
-                            '<li>Tabel dalam dokumen dikonversi menjadi tabel HTML</li>' .
-                            '<li>Gambar dalam dokumen diekstrak dan diunggah ke server</li>' .
-                            '<li>Judul berita diambil otomatis dari heading pertama dokumen</li>' .
-                            '<li>Setelah tersimpan, konten bisa diedit via mode Manual</li>' .
+                            ($get('input_mode') === 'pdf' ? 
+                                '<li>Format PDF didesain untuk percetakan, sehingga hanya Teks yang akan di-import (Gambar & Tabel <strong>tidak akan</strong> terbaca).</li>' .
+                                '<li>Struktur paragraf mungkin akan terpotong secara tidak rapi.</li>' 
+                                : 
+                                '<li>Beberapa bagian (seperti tabel kompleks atau posisi gambar) mungkin ter-import kurang rapi.</li>'
+                            ) .
+                            '<li>Selalu lakukan penyesuaian akhir menggunakan editor manual (Tab Buat Manual).</li>' .
                             '</ul>' .
+                            '</div>' .
+                            '</div>' .
                             '</div>'
                         ))
-                        ->hidden(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'edit' || $get('input_mode') === 'manual')
+                        ->hidden(fn (\Filament\Forms\Get $get, string $operation) => $operation === 'edit' || !in_array($get('input_mode'), ['word', 'pdf']))
                         ->columnSpanFull(),
                 ])
                 ->columnSpan(2),

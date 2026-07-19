@@ -30,6 +30,11 @@ class CreateBerita extends CreateRecord
             $data = $this->processWordImport($data);
         }
 
+        // ── Mode: Import dari PDF ─────────────────────────────────────────────
+        if (!empty($data['pdf_file'])) {
+            $data = $this->processPdfImport($data);
+        }
+
         // ── Sanitasi HTML (XSS protection) ───────────────────────────────────
         $data['konten'] = HtmlSanitizer::clean($data['konten'] ?? '');
 
@@ -45,7 +50,48 @@ class CreateBerita extends CreateRecord
         $data['excerpt'] = HtmlSanitizer::excerpt($data['konten'], 200);
 
         // ── Hapus field sementara (bukan kolom database) ──────────────────────
-        unset($data['word_file'], $data['word_file_original_name'], $data['input_mode']);
+        unset($data['word_file'], $data['word_file_original_name'], $data['pdf_file'], $data['pdf_file_original_name'], $data['input_mode']);
+
+        return $data;
+    }
+
+    /**
+     * Proses file PDF: ekstrak teks ke paragraf HTML, auto-fill judul.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function processPdfImport(array $data): array
+    {
+        try {
+            // Ambil path file yang baru di-upload (biasanya dalam array jika multiple, 
+            // tapi FileUpload secara default string atau array 1 elemen)
+            $filePath = is_array($data['pdf_file']) ? array_values($data['pdf_file'])[0] : $data['pdf_file'];
+
+            $importer = new \App\Services\PdfImportService();
+            $result   = $importer->importFromPath($filePath);
+
+            // Auto-fill judul jika user tidak mengisi manual
+            if (empty($data['judul']) && !empty($result['judul'])) {
+                $data['judul'] = $result['judul'];
+                $data['slug']  = Str::slug($result['judul']);
+            }
+
+            // Set konten HTML dari hasil PDF
+            $data['konten'] = $result['konten'];
+
+        } catch (\Throwable $e) {
+            \Filament\Notifications\Notification::make()
+                ->title('Gagal mengimport PDF')
+                ->body('Terjadi kesalahan saat memproses file PDF: ' . $e->getMessage())
+                ->danger()
+                ->send();
+        } finally {
+            // Bersihkan file PDF temporary agar storage tidak penuh
+            if (!empty($filePath) && Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+        }
 
         return $data;
     }

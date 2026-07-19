@@ -83,6 +83,32 @@ class EditBerita extends EditRecord
                     $this->processWordImportForEdit($data['word_file_modal'] ?? null);
                 }),
 
+            // ── Tombol Import dari PDF (ganti konten) ─────────────────────────
+            Action::make('importPdf')
+                ->label('Import dari PDF')
+                ->icon('heroicon-o-document-text')
+                ->color('gray')
+                ->modalHeading('Import Teks dari File PDF')
+                ->modalDescription(
+                    'Upload file .pdf untuk mengganti konten berita ini dengan ekstraksi teks dari PDF. ' .
+                    'Judul yang sudah ada tidak akan berubah. (Catatan: Gambar/Tabel tidak ter-import)'
+                )
+                ->modalSubmitActionLabel('Proses & Terapkan')
+                ->form([
+                    FileUpload::make('pdf_file_modal')
+                        ->label('Pilih File PDF (.pdf)')
+                        ->disk('public')
+                        ->directory('temp/pdf-import')
+                        ->visibility('private')
+                        ->acceptedFileTypes(['application/pdf'])
+                        ->maxSize(10240)
+                        ->required()
+                        ->helperText('Maks. 10 MB. Konten saat ini akan digantikan oleh teks dari dokumen PDF.'),
+                ])
+                ->action(function (array $data) {
+                    $this->processPdfImportForEdit($data['pdf_file_modal'] ?? null);
+                }),
+
             DeleteAction::make()->requiresConfirmation(),
         ];
     }
@@ -155,6 +181,64 @@ class EditBerita extends EditRecord
             // Hapus file temp
             if (!empty($relativeWordPath)) {
                 Storage::disk('public')->delete($relativeWordPath);
+            }
+        }
+    }
+
+    /**
+     * Proses import PDF saat edit — update konten record secara langsung.
+     */
+    protected function processPdfImportForEdit(?string $relativePdfPath): void
+    {
+        if (!$relativePdfPath) {
+            return;
+        }
+
+        try {
+            $importer = new \App\Services\PdfImportService();
+            $result   = $importer->importFromPath($relativePdfPath);
+
+            if (empty($result['konten'])) {
+                Notification::make()
+                    ->title('Dokumen kosong atau teks tidak dapat dibaca')
+                    ->warning()
+                    ->send();
+                return;
+            }
+
+            $cleanHtml = HtmlSanitizer::clean($result['konten']);
+
+            $updateData = [
+                'konten'  => $cleanHtml,
+                'excerpt' => HtmlSanitizer::excerpt($cleanHtml, 200),
+            ];
+
+            // Jika judul record masih kosong, ambil dari PDF
+            if (empty($this->record->judul) && !empty($result['judul'])) {
+                $updateData['judul'] = $result['judul'];
+                $updateData['slug']  = Str::slug($result['judul']);
+            }
+
+            $this->record->update($updateData);
+            $this->refreshFormData(['konten', 'judul', 'slug', 'excerpt']);
+
+            Notification::make()
+                ->title('Konten teks berhasil diperbarui dari PDF')
+                ->body('Teks dari PDF berhasil di-import. Harap periksa dan rapikan kembali konten Anda.')
+                ->warning() // Menggunakan warna kuning/warning agar sesuai dengan alert peringatan
+                ->send();
+
+        } catch (\Throwable $e) {
+            Notification::make()
+                ->title('Gagal import PDF')
+                ->body('Terjadi kesalahan: ' . $e->getMessage())
+                ->danger()
+                ->persistent()
+                ->send();
+        } finally {
+            // Hapus file temp
+            if (!empty($relativePdfPath) && Storage::disk('public')->exists($relativePdfPath)) {
+                Storage::disk('public')->delete($relativePdfPath);
             }
         }
     }

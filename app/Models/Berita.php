@@ -119,10 +119,12 @@ class Berita extends Model
      */
     public function scopePublished(Builder $query): Builder
     {
+        // Menambahkan buffer 24 jam untuk mengatasi masalah zona waktu (timezone) 
+        // antara PHP dan Database yang sering terjadi di shared hosting.
         return $query->where('status', self::STATUS_PUBLISHED)
                      ->where(fn (Builder $q) => $q
                          ->whereNull('tanggal_publish')
-                         ->orWhere('tanggal_publish', '<=', now())
+                         ->orWhere('tanggal_publish', '<=', now()->addHours(24))
                      );
     }
 
@@ -195,6 +197,6 @@ class Berita extends Model
     public function sudahPublished(): bool
     {
         return $this->status === self::STATUS_PUBLISHED
-            && ($this->tanggal_publish === null || $this->tanggal_publish->lte(now()));
+            && ($this->tanggal_publish === null || $this->tanggal_publish->lte(now()->addHours(24)));
     }
 }
