@@ -422,30 +422,35 @@
       <div class="section-heading__divider"><span></span><i></i><span></span></div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;margin-bottom:2.5rem;">
-      @foreach($beritaTerbaru as $b)
-        <article class="card-berita" style="cursor:pointer;" onclick="window.location.href='{{ route('berita.show', $b->slug) }}'">
-          @if($b->thumbnail)
-            <img src="{{ Storage::url($b->thumbnail) }}" alt="{{ $b->judul }}" class="card-berita__img" loading="lazy">
-          @else
-            <div class="card-berita__img-placeholder" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" stroke="var(--lam-green)" stroke-width="1" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </div>
-          @endif
-          <div class="card-berita__body">
-            <p class="card-berita__cat">{{ $b->kategori?->nama ?? 'Umum' }}</p>
-            <h3 class="card-berita__title">
-              <a href="{{ route('berita.show', $b->slug) }}" style="color:inherit;">{{ $b->judul }}</a>
+    <div class="beranda-berita-list">
+      @foreach($beritaTerbaru->take(3) as $idx => $b)
+        <article class="beranda-berita-card" onclick="window.location.href='{{ route('berita.show', $b->slug) }}'">
+          {{-- Thumbnail --}}
+          <div class="beranda-berita-card__thumb">
+            @if($b->thumbnail)
+              <img src="{{ Storage::url($b->thumbnail) }}" alt="{{ $b->judul }}" loading="lazy">
+            @else
+              <div class="beranda-berita-card__thumb-placeholder" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" stroke="var(--lam-gold)" stroke-width="1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+            @endif
+            {{-- Nomor urut --}}
+            <span class="beranda-berita-card__num">{{ str_pad($idx + 1, 2, '0', STR_PAD_LEFT) }}</span>
+          </div>
+          {{-- Konten --}}
+          <div class="beranda-berita-card__body">
+            <p class="beranda-berita-card__cat">{{ $b->kategori?->nama ?? 'Umum' }}</p>
+            <h3 class="beranda-berita-card__title">
+              <a href="{{ route('berita.show', $b->slug) }}">{{ $b->judul }}</a>
             </h3>
-            <p class="card-berita__excerpt">{{ $b->excerpt }}</p>
-            <div class="card-berita__meta">
+            <p class="beranda-berita-card__excerpt">{{ $b->excerpt }}</p>
+            <div class="beranda-berita-card__meta">
               <time datetime="{{ $b->tanggal_publish?->toISOString() }}">
                 {{ $b->tanggal_publish?->translatedFormat('d M Y') ?? '—' }}
               </time>
-              <a href="{{ route('berita.show', $b->slug) }}"
-                 style="color:var(--lam-green);font-weight:600;font-size:.8rem;display:flex;align-items:center;gap:.25rem;">
+              <a href="{{ route('berita.show', $b->slug) }}" class="beranda-berita-card__read">
                 Selengkapnya
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </a>
             </div>
           </div>
@@ -453,7 +458,7 @@
       @endforeach
     </div>
 
-    <div style="text-align:center;">
+    <div style="text-align:center;margin-top:2.5rem;">
       <a href="{{ route('berita.index') }}" class="btn btn-outline">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
         Lihat Semua Berita
@@ -461,6 +466,127 @@
     </div>
   </div>
 </section>
+
+<style>
+  /* ─── Beranda: Berita List ──────────────────────────────────── */
+  .beranda-berita-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .beranda-berita-card {
+    display: flex;
+    align-items: stretch;
+    background: var(--lam-bg-alt);
+    border: 1px solid var(--lam-border);
+    border-left: 4px solid var(--lam-gold);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+    min-height: 160px;
+  }
+  .beranda-berita-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(249,149,34,.18), 0 4px 16px rgba(0,0,0,.08);
+    border-left-color: var(--lam-gold-d);
+    border-color: var(--lam-gold);
+  }
+  /* Thumbnail */
+  .beranda-berita-card__thumb {
+    width: 220px;
+    min-width: 220px;
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: var(--lam-black-d);
+  }
+  .beranda-berita-card__thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: transform .4s ease;
+  }
+  .beranda-berita-card:hover .beranda-berita-card__thumb img {
+    transform: scale(1.06);
+  }
+  .beranda-berita-card__thumb-placeholder {
+    width: 100%; height: 100%; min-height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--lam-black-d);
+  }
+  /* Nomor urut */
+  .beranda-berita-card__num {
+    position: absolute; top: .6rem; left: .6rem;
+    font-size: .7rem; font-weight: 800;
+    font-family: var(--font-head);
+    color: var(--lam-gold);
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(4px);
+    padding: .2rem .5rem;
+    border-radius: 4px;
+    letter-spacing: .06em;
+    line-height: 1;
+  }
+  /* Body */
+  .beranda-berita-card__body {
+    flex: 1;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: .5rem;
+  }
+  .beranda-berita-card__cat {
+    font-size: .68rem; font-weight: 700;
+    letter-spacing: .15em; text-transform: uppercase;
+    color: var(--lam-gold); margin: 0;
+  }
+  .beranda-berita-card__title {
+    font-family: var(--font-head);
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    font-weight: 700; line-height: 1.35; margin: 0;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .beranda-berita-card__title a {
+    color: var(--lam-text);
+    transition: color .2s;
+  }
+  .beranda-berita-card:hover .beranda-berita-card__title a {
+    color: var(--lam-gold);
+  }
+  .beranda-berita-card__excerpt {
+    font-size: .85rem; color: var(--lam-text-l); margin: 0; line-height: 1.6;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .beranda-berita-card__meta {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: .78rem; color: var(--lam-text-l);
+    padding-top: .6rem; border-top: 1px solid var(--lam-border);
+    flex-wrap: wrap; gap: .4rem;
+  }
+  .beranda-berita-card__read {
+    color: var(--lam-gold); font-weight: 600; font-size: .8rem;
+    display: flex; align-items: center; gap: .25rem;
+    transition: color .2s; white-space: nowrap;
+  }
+  .beranda-berita-card__read:hover { color: var(--lam-gold-d); }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    .beranda-berita-card {
+      min-height: 130px;
+    }
+    .beranda-berita-card__thumb {
+      width: 120px; min-width: 120px;
+    }
+    .beranda-berita-card__body {
+      padding: .875rem 1rem;
+    }
+    .beranda-berita-card__excerpt {
+      display: none;
+    }
+  }
+</style>
 @endif
 
 {{-- ══════════════════════════════════════════════════════════════

@@ -121,28 +121,53 @@
   .card-berita-list__read:hover { text-decoration:underline; }
 
   @media (max-width:640px) {
-    /* List tetap horizontal di mobile, thumbnail lebih kecil */
+    /* ── List: lebih persegi panjang di mobile ─── */
+    .card-berita-list {
+      min-height: 140px;
+    }
     .card-berita-list__thumb {
-      width:110px; min-width:110px;
-      height:auto; min-height:110px;
+      width: 130px; min-width: 130px;
     }
-    .card-berita-list__thumb img {
-      height:100%; min-height:110px;
-    }
+    .card-berita-list__thumb img,
     .card-berita-list__thumb-placeholder {
-      min-height:110px;
+      min-height: 140px;
     }
     .card-berita-list__body {
-      padding:.75rem 1rem;
-      gap:.4rem;
+      padding: .875rem 1rem;
+      gap: .35rem;
     }
-    .card-berita-list__title { font-size:.9rem; }
+    .card-berita-list__title { font-size: .95rem; }
     .card-berita-list__excerpt {
-      -webkit-line-clamp:2;
-      font-size:.8rem;
+      -webkit-line-clamp: 2;
+      font-size: .8rem;
     }
-    .card-berita-list__meta { font-size:.72rem; }
-    .berita-grid { grid-template-columns:1fr; }
+    .card-berita-list__meta { font-size: .72rem; }
+
+    /* ── Grid: 2 kolom di mobile ─────────────────── */
+    .berita-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: .875rem;
+    }
+    .berita-grid .card-berita__img,
+    .berita-grid .card-berita__img-placeholder {
+      height: 130px;
+    }
+    .berita-grid .card-berita__body {
+      padding: .75rem;
+    }
+    .berita-grid .card-berita__title {
+      font-size: .875rem;
+      -webkit-line-clamp: 2;
+    }
+    .berita-grid .card-berita__excerpt {
+      display: none;
+    }
+    .berita-grid .card-berita__meta {
+      font-size: .7rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: .25rem;
+    }
   }
 </style>
 
