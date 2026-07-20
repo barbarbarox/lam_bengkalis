@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Profil Lembaga — ' . ($setting->nama_lembaga ?? 'LAM Bengkalis'))
+@section('title', 'Profil Lembaga — ' . ($setting->nama_lembaga ?? 'LAMR Bengkalis'))
 @section('meta_description', $setting->meta_deskripsi ?? '')
 
 @section('content')
@@ -12,8 +12,8 @@
   @if($heroBg)<div class="page-hero__gold-edge"></div>@endif
   <div class="container" style="position:relative;z-index:2;text-align:center;">
     <p style="font-size:.75rem;letter-spacing:.25em;text-transform:uppercase;color:var(--lam-gold);font-weight:600;margin-bottom:.75rem;">Tentang Kami</p>
-    <h1 style="font-family:var(--font-head);font-size:clamp(1.75rem,4vw,2.75rem);color:white;">Profil Lembaga Adat Melayu</h1>
-    <p style="color:rgba(255,255,255,.7);margin-top:.75rem;">{{ $setting->nama_lembaga ?? 'LAM Bengkalis' }}</p>
+    <h1 style="font-family:var(--font-head);font-size:clamp(1.75rem,4vw,2.75rem);color:white;">Profil Lembaga Adat Melayu Riau</h1>
+    <p style="color:rgba(255,255,255,.7);margin-top:.75rem;">{{ $setting->nama_lembaga ?? 'LAMR Bengkalis' }}</p>
   </div>
 </div>
 
@@ -92,7 +92,7 @@
         @if(!empty($sejarahTimeline) && count($sejarahTimeline) > 0)
           <div class="section-heading" style="text-align:center;margin-bottom:3rem;">
             <span class="section-heading__eyebrow">Latar Belakang</span>
-            <h2 class="section-heading__title">Sejarah LAM Bengkalis</h2>
+            <h2 class="section-heading__title">Sejarah LAMR Bengkalis</h2>
             <div class="section-heading__divider"><span></span><i></i><span></span></div>
           </div>
 

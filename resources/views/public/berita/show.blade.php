@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $artikel->judul . ' — ' . ($setting->nama_lembaga ?? 'LAM Bengkalis'))
+@section('title', $artikel->judul . ' — ' . ($setting->nama_lembaga ?? 'LAMR Bengkalis'))
 @section('meta_description', Str::limit(strip_tags($artikel->excerpt ?? $artikel->konten ?? ''), 155))
 @section('og_type', 'article')
 @section('og_image', $artikel->thumbnail ? Storage::url($artikel->thumbnail) : asset('images/icon-512x512.png'))
@@ -341,7 +341,7 @@
   @endif
   "publisher": {
     "@type": "Organization",
-    "name": "{{ addslashes($setting->nama_lembaga ?? 'LAM Bengkalis') }}",
+    "name": "{{ addslashes($setting->nama_lembaga ?? 'LAMR Bengkalis') }}",
     "logo": {
       "@type": "ImageObject",
       "url": "{{ asset('images/icon-192x192.png') }}"

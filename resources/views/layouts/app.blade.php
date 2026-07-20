@@ -8,24 +8,24 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   {{-- SEO --}}
-  <title>@yield('title', config('app.name', 'LAM Bengkalis'))</title>
-  <meta name="description" content="@yield('meta_description', $setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Kabupaten Bengkalis.')">
+  <title>@yield('title', config('app.name', 'LAMR Bengkalis'))</title>
+  <meta name="description" content="@yield('meta_description', $setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Riau Kabupaten Bengkalis.')">
 
   {{-- Canonical URL --}}
   <link rel="canonical" href="{{ url()->current() }}">
 
   {{-- Open Graph (Google + Sosial Media) --}}
   <meta property="og:type"        content="@yield('og_type', 'website')">
-  <meta property="og:site_name"   content="{{ $setting->nama_lembaga ?? 'LAM Bengkalis' }}">
+  <meta property="og:site_name"   content="{{ $setting->nama_lembaga ?? 'LAMR Bengkalis' }}">
   <meta property="og:url"         content="{{ url()->current() }}">
-  <meta property="og:title"       content="@yield('title', config('app.name', 'LAM Bengkalis'))">
-  <meta property="og:description" content="@yield('meta_description', $setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Kabupaten Bengkalis.')">
+  <meta property="og:title"       content="@yield('title', config('app.name', 'LAMR Bengkalis'))">
+  <meta property="og:description" content="@yield('meta_description', $setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Riau Kabupaten Bengkalis.')">
   <meta property="og:image"       content="@yield('og_image', asset('images/icon-512x512.png'))">
   <meta property="og:locale"      content="id_ID">
 
   {{-- Twitter Card --}}
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="@yield('title', config('app.name', 'LAM Bengkalis'))">
+  <meta name="twitter:title"       content="@yield('title', config('app.name', 'LAMR Bengkalis'))">
   <meta name="twitter:description" content="@yield('meta_description', $setting->meta_deskripsi ?? '')">
   <meta name="twitter:image"       content="@yield('og_image', asset('images/icon-512x512.png'))">
 
@@ -56,7 +56,7 @@
   <style>
     /* ─── Design Tokens ────────────────────────────────────────── */
     :root {
-      /* ── Warna Resmi LAM Bengkalis ── */
+      /* ── Warna Resmi LAMR Bengkalis ── */
       /* Kuning Emas — kebesaran & kemuliaan */
       --lam-gold:    #F99522;
       --lam-gold-d:  #d97c0e;
@@ -706,13 +706,13 @@
   <div class="container navbar__inner">
 
     {{-- Brand --}}
-    <a href="{{ route('beranda') }}" class="navbar__brand" aria-label="LAM Bengkalis — Halaman Utama">
+    <a href="{{ route('beranda') }}" class="navbar__brand" aria-label="LAMR Bengkalis — Halaman Utama">
       @if($setting->logo_path)
-        <img src="{{ Storage::url($setting->logo_path) }}" alt="Logo LAM Bengkalis" class="navbar__brand-logo" width="40" height="40">
+        <img src="{{ Storage::url($setting->logo_path) }}" alt="Logo LAMR Bengkalis" class="navbar__brand-logo" width="40" height="40">
       @endif
       <div class="navbar__brand-text">
-        <span class="navbar__brand-name">{{ $setting->singkatan ?? 'LAM Bengkalis' }}</span>
-        <span class="navbar__brand-sub">Lembaga Adat Melayu</span>
+        <span class="navbar__brand-name">{{ $setting->singkatan ?? 'LAMR Bengkalis' }}</span>
+        <span class="navbar__brand-sub">Lembaga Adat Melayu Riau</span>
       </div>
     </a>
 
@@ -918,7 +918,7 @@
   <div class="container">
     <div class="footer__grid">
       <div>
-        <p class="footer__brand-name">{{ $setting->nama_lembaga ?? 'Lembaga Adat Melayu Kabupaten Bengkalis' }}</p>
+        <p class="footer__brand-name">{{ $setting->nama_lembaga ?? 'Lembaga Adat Melayu Riau Kabupaten Bengkalis' }}</p>
         <p class="footer__brand-desc">
           {{ $setting->meta_deskripsi ?? 'Menjaga dan melestarikan adat budaya Melayu di Kabupaten Bengkalis, Riau.' }}
         </p>
@@ -995,8 +995,8 @@
     </div>
 
     <div class="footer__bottom">
-      <span>&copy; {{ $setting->tahun_berdiri ?? date('Y') }}–{{ date('Y') }} {{ $setting->nama_lembaga ?? 'LAM Bengkalis' }}. Hak Cipta Dilindungi.</span>
-      <span style="font-size:.75rem;opacity:.6;">Sistem Informasi LAM Bengkalis &bull; Supported by <span style="color:var(--lam-gold);font-weight:600;">Tim JejakLayar</span></span>
+      <span>&copy; {{ $setting->tahun_berdiri ?? date('Y') }}–{{ date('Y') }} {{ $setting->nama_lembaga ?? 'LAMR Bengkalis' }}. Hak Cipta Dilindungi.</span>
+      <span style="font-size:.75rem;opacity:.6;">Sistem Informasi LAMR Bengkalis &bull; Supported by <span style="color:var(--lam-gold);font-weight:600;">Tim JejakLayar</span></span>
     </div>
   </div>
 </footer>
@@ -1006,7 +1006,7 @@
   <div style="display: flex; align-items: center; gap: 1rem;">
     <img src="{{ asset('images/icon-192x192.png') }}" alt="Icon" style="width: 48px; height: 48px; border-radius: 12px;">
     <div>
-      <div style="font-weight: bold; font-family: var(--font-head); font-size: 1.1rem; color: var(--lam-gold);">LAM Bengkalis</div>
+      <div style="font-weight: bold; font-family: var(--font-head); font-size: 1.1rem; color: var(--lam-gold);">LAMR Bengkalis</div>
       <div style="font-size: 0.8rem; color: #ccc;">Install aplikasi untuk akses lebih cepat dan mudah</div>
     </div>
   </div>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($setting->nama_lembaga ?? 'LAM Bengkalis') . ' — Beranda')
+@section('title', ($setting->nama_lembaga ?? 'LAMR Bengkalis') . ' — Beranda')
 
 @section('content')
 
@@ -11,7 +11,7 @@
   id="hero"
   class="hero-split"
   x-data="backgroundCarousel(window.lamSlidesData)"
-  aria-label="Hero beranda Lembaga Adat Melayu"
+  aria-label="Hero beranda Lembaga Adat Melayu Riau"
 >
 
   {{-- ── KOLOM KIRI: Konten & Motif Budaya ─────────────────────── --}}
@@ -33,7 +33,7 @@
 
       {{-- Judul Utama --}}
       <h1 class="hero-split__title">
-        {{ $setting->nama_lembaga ?? 'Lembaga Adat Melayu Kabupaten Bengkalis' }}
+        {{ $setting->nama_lembaga ?? 'Lembaga Adat Melayu Riau Kabupaten Bengkalis' }}
       </h1>
 
       {{-- Divider motif kuntum bersanding --}}
@@ -50,7 +50,7 @@
 
       {{-- Deskripsi --}}
       <p class="hero-split__desc">
-        {{ $setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu (LAM) Kabupaten Bengkalis — menjaga dan melestarikan budaya, adat istiadat Melayu Riau di Kabupaten Bengkalis, Provinsi Riau.' }}
+        {{ $setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Riau (LAMR) Kabupaten Bengkalis — menjaga dan melestarikan budaya, adat istiadat Melayu Riau di Kabupaten Bengkalis, Provinsi Riau.' }}
       </p>
 
       {{-- Tombol CTA --}}
@@ -1116,11 +1116,11 @@
 {
   "@@context": "https://schema.org",
   "@type": "GovernmentOrganization",
-  "name": "{{ addslashes($setting->nama_lembaga ?? 'Lembaga Adat Melayu Kabupaten Bengkalis') }}",
-  "alternateName": "LAM Bengkalis",
+  "name": "{{ addslashes($setting->nama_lembaga ?? 'Lembaga Adat Melayu Riau Kabupaten Bengkalis') }}",
+  "alternateName": "LAMR Bengkalis",
   "url": "{{ url('/') }}",
   "logo": "{{ asset('images/icon-512x512.png') }}",
-  "description": "{{ addslashes($setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Kabupaten Bengkalis.') }}",
+  "description": "{{ addslashes($setting->meta_deskripsi ?? 'Website resmi Lembaga Adat Melayu Riau Kabupaten Bengkalis.') }}",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Bengkalis",

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Berita — ' . ($setting->nama_lembaga ?? 'LAM Bengkalis'))
+@section('title', 'Berita — ' . ($setting->nama_lembaga ?? 'LAMR Bengkalis'))
 
 @section('content')
 

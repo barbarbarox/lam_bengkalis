@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Galeri Foto — ' . ($setting->nama_lembaga ?? 'LAM Bengkalis'))
-@section('meta_description', 'Galeri foto kegiatan dan dokumentasi ' . ($setting->nama_lembaga ?? 'Lembaga Adat Melayu Bengkalis'))
+@section('title', 'Galeri Foto — ' . ($setting->nama_lembaga ?? 'LAMR Bengkalis'))
+@section('meta_description', 'Galeri foto kegiatan dan dokumentasi ' . ($setting->nama_lembaga ?? 'Lembaga Adat Melayu Riau Bengkalis'))
 
 @section('content')
 
@@ -13,7 +13,7 @@
   <div class="container" style="position:relative;z-index:2;text-align:center;">
     <p style="font-size:.75rem;letter-spacing:.25em;text-transform:uppercase;color:var(--lam-gold);font-weight:600;margin-bottom:.75rem;">Dokumentasi &amp; Kenangan</p>
     <h1 style="font-family:var(--font-head);font-size:clamp(1.75rem,4vw,2.75rem);color:white;">Galeri Foto</h1>
-    <p style="color:rgba(255,255,255,.7);margin-top:.75rem;">Momen dan kegiatan Lembaga Adat Melayu Kabupaten Bengkalis</p>
+    <p style="color:rgba(255,255,255,.7);margin-top:.75rem;">Momen dan kegiatan Lembaga Adat Melayu Riau Kabupaten Bengkalis</p>
   </div>
 </div>
 <style>
@@ -58,7 +58,7 @@
              @if($foto->judul) title="{{ $foto->judul }}" @endif>
           <div class="masonry-img-wrap">
             <img src="{{ Storage::url($foto->foto_path) }}"
-                 alt="{{ $foto->judul ?? 'Foto galeri LAM Bengkalis' }}"
+                 alt="{{ $foto->judul ?? 'Foto galeri LAMR Bengkalis' }}"
                  loading="lazy"
                  class="masonry-img">
             @if($foto->judul || $foto->deskripsi)

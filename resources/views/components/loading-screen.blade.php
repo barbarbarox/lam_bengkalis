@@ -1,5 +1,5 @@
 {{--
-    Loading Screen — Komponen LAM Bengkalis
+    Loading Screen — Komponen LAMR Bengkalis
     ==========================================
     - Animasi kapal tradisional dengan gelombang SVG
     - Progress bar simulasi dengan caption berganti
@@ -281,7 +281,7 @@
 </style>
 
 <div class="lam-loader" id="lamLoader" role="status"
-     aria-label="Memuat halaman Lembaga Adat Melayu Kabupaten Bengkalis">
+     aria-label="Memuat halaman Lembaga Adat Melayu Riau Kabupaten Bengkalis">
 
   <div class="lam-loader__stars" aria-hidden="true">
     <span style="top:12%;left:18%;animation-delay:.2s;"></span>
@@ -292,7 +292,7 @@
   </div>
 
   <div class="lam-loader__header">
-    <span class="lam-loader__eyebrow">Lembaga Adat Melayu</span>
+    <span class="lam-loader__eyebrow">Lembaga Adat Melayu Riau</span>
     <h2 class="lam-loader__title">Kabupaten Bengkalis</h2>
     <div class="lam-loader__divider" aria-hidden="true"><span></span><i></i><span></span></div>
   </div>

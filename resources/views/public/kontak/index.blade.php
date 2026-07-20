@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kontak — ' . ($setting->nama_lembaga ?? 'LAM Bengkalis'))
+@section('title', 'Kontak — ' . ($setting->nama_lembaga ?? 'LAMR Bengkalis'))
 
 @push('head_scripts')
 {{-- reCAPTCHA v3 --}}
