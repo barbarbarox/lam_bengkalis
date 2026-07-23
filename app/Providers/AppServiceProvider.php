@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\Layanan;
 use App\Models\SiteSetting;
+use App\Models\StrukturOrganisasi;
+use App\Observers\StrukturOrganisasiObserver;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,6 +29,9 @@ class AppServiceProvider extends ServiceProvider
         config([
             'app.admin_session_timeout' => (int) env('ADMIN_SESSION_TIMEOUT', 30),
         ]);
+
+        // Register observer untuk invalidasi cache publik saat data struktur berubah
+        StrukturOrganisasi::observe(StrukturOrganisasiObserver::class);
 
         // Paksa skema HTTPS di production (mengatasi isu canonical & sitemap jika menggunakan Cloudflare)
         if (config('app.env') === 'production' || request()->header('x-forwarded-proto') === 'https' || str_contains(config('app.url'), 'https://')) {

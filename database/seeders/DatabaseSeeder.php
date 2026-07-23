@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SuperAdminSeeder::class,
-            ContentSeeder::class,
+            JelajahBudayaSeeder::class,
+            LamrBengkalisStrukturSeeder2025::class,
+            ModulBaruSeeder::class,
         ]);
     }
 }

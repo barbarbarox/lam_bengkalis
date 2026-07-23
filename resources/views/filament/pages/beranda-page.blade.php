@@ -1,14 +1,14 @@
 <x-filament-panels::page>
-    {{-- ── Sambutan BPH ───────────────────────────────────────────────────────── --}}
+    {{-- ── Selayang Pandang ───────────────────────────────────────────────────────── --}}
     <x-filament::section>
-        <x-slot name="heading">Sambutan Dewan Pimpinan Harian</x-slot>
-        <x-slot name="description">Pesan sambutan yang ditampilkan di halaman beranda.</x-slot>
+        <x-slot name="heading">Selayang Pandang & Balai Adat</x-slot>
+        <x-slot name="description">Tentang LAMR Bengkalis dan foto hero.</x-slot>
 
-        {{ $this->sambutan_bphForm }}
+        {{ $this->selayangPandangForm }}
 
         <div class="mt-4 flex justify-end">
-            <x-filament::button wire:click="saveSambutan" icon="heroicon-o-check" color="primary">
-                Simpan Sambutan
+            <x-filament::button wire:click="saveSelayangPandang" icon="heroicon-o-check" color="primary">
+                Simpan Selayang Pandang
             </x-filament::button>
         </div>
     </x-filament::section>

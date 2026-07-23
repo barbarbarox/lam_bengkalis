@@ -7,6 +7,7 @@ use App\Services\HtmlSanitizer;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use AmidEsfahani\FilamentTinyEditor\TinyEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -154,13 +155,10 @@ class ProfilPage extends Page implements HasForms
             Section::make('Tugas dan Fungsi')
                 ->icon('heroicon-o-briefcase')
                 ->schema([
-                    RichEditor::make('tugas_fungsi_konten')
+                    TinyEditor::make('tugas_fungsi_konten')
                         ->label('Isi Tugas dan Fungsi')
                         ->required()
-                        ->toolbarButtons([
-                            'bold', 'italic', 'h2', 'h3',
-                            'bulletList', 'orderedList', 'link', 'redo', 'undo',
-                        ])
+                        ->profile('default')
                         ->columnSpanFull(),
                 ]),
         ])->statePath('');

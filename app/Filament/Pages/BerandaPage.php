@@ -33,13 +33,9 @@ class BerandaPage extends Page implements HasForms
 
     // ── State form fields ─────────────────────────────────────────────────────
 
-    // Sambutan BPH
-    public ?string $sambutan_nama_ketua    = null;
-    public ?string $sambutan_jabatan       = null;
-    public ?string $sambutan_isi           = null;
-    public $sambutan_foto          = [];
-    public ?int    $sambutan_periode_mulai = null;
-    public ?int    $sambutan_periode_selesai = null;
+    // Selayang Pandang & Balai Adat (disimpan di SiteSetting)
+    public ?string $selayang_pandang = null;
+    public $foto_balai_adat          = null;
 
     // Background Slides — array untuk Repeater
     public array $slides  = [];
@@ -51,15 +47,12 @@ class BerandaPage extends Page implements HasForms
 
     public function mount(): void
     {
-        // Load Sambutan BPH aktif
-        $sambutan = SambutanBph::aktif()->first();
-        $this->sambutan_bphForm->fill([
-            'sambutan_nama_ketua'      => $sambutan?->nama_ketua,
-            'sambutan_jabatan'         => $sambutan?->jabatan,
-            'sambutan_isi'             => $sambutan?->isi_sambutan,
-            'sambutan_foto'            => $sambutan?->foto,
-            'sambutan_periode_mulai'   => $sambutan?->periode_mulai,
-            'sambutan_periode_selesai' => $sambutan?->periode_selesai,
+        $setting = \App\Models\SiteSetting::instance();
+
+        // Load Selayang Pandang
+        $this->selayangPandangForm->fill([
+            'selayang_pandang' => $setting->selayang_pandang,
+            'foto_balai_adat'  => $setting->foto_balai_adat,
         ]);
 
         // Load Background Slides
@@ -94,58 +87,32 @@ class BerandaPage extends Page implements HasForms
 
     // ── Forms ─────────────────────────────────────────────────────────────────
 
-    public function sambutan_bphForm(Form $form): Form
+    public function selayangPandangForm(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make('Sambutan Ketua BPH')
-                    ->icon('heroicon-o-user-circle')
-                    ->description('Pesan sambutan yang ditampilkan di halaman beranda.')
+                Section::make('Selayang Pandang & Foto Balai Adat')
+                    ->icon('heroicon-o-building-library')
+                    ->description('Tentang LAMR Bengkalis dan foto balai adat untuk hero beranda.')
                     ->schema([
-                        TextInput::make('sambutan_nama_ketua')
-                            ->label('Nama Ketua')
-                            ->required()
-                            ->maxLength(200),
-
-                        TextInput::make('sambutan_jabatan')
-                            ->label('Jabatan')
-                            ->required()
-                            ->maxLength(200)
-                            ->placeholder('Ketua Umum LAM Bengkalis'),
-
-                        TextInput::make('sambutan_periode_mulai')
-                            ->label('Tahun Mulai Periode')
-                            ->numeric()
-                            ->minValue(1900)
-                            ->maxValue(2100),
-
-                        TextInput::make('sambutan_periode_selesai')
-                            ->label('Tahun Selesai Periode')
-                            ->numeric()
-                            ->minValue(1900)
-                            ->maxValue(2100),
-
-                        FileUpload::make('sambutan_foto')
-                            ->label('Foto Ketua')
+                        FileUpload::make('foto_balai_adat')
+                            ->label('Foto Balai Adat (Hero Background)')
                             ->image()
                             ->disk('public')
-                            ->directory('sambutan')
+                            ->directory('hero')
                             ->imageEditor()
-                            ->imageEditorAspectRatios(['1:1', '3:4'])
-                            ->maxSize(1024)
+                            ->maxSize(3072)
                             ->columnSpanFull(),
 
-                        RichEditor::make('sambutan_isi')
-                            ->label('Isi Sambutan')
-                            ->required()
+                        RichEditor::make('selayang_pandang')
+                            ->label('Teks Selayang Pandang')
                             ->toolbarButtons([
                                 'bold', 'italic', 'underline',
                                 'bulletList', 'orderedList',
                                 'redo', 'undo',
                             ])
                             ->columnSpanFull(),
-                    ])
-                    ->columns(2),
+                    ]),
             ])
             ->statePath('');
     }
@@ -267,31 +234,23 @@ class BerandaPage extends Page implements HasForms
 
     protected function getForms(): array
     {
-        return ['sambutan_bphForm', 'slidesForm', 'bannersForm'];
+        return ['selayangPandangForm', 'slidesForm', 'bannersForm'];
     }
 
     // ── Save Actions ──────────────────────────────────────────────────────────
 
-    public function saveSambutan(): void
+    public function saveSelayangPandang(): void
     {
-        $data = $this->sambutan_bphForm->getState();
+        $data = $this->selayangPandangForm->getState();
 
-        // Deaktifkan semua sambutan lama
-        SambutanBph::query()->update(['is_active' => false]);
-
-        // Buat atau update sambutan
-        SambutanBph::create([
-            'nama_ketua'      => $data['sambutan_nama_ketua'],
-            'jabatan'         => $data['sambutan_jabatan'],
-            'isi_sambutan'    => HtmlSanitizer::clean($data['sambutan_isi'] ?? ''),
-            'foto'            => $data['sambutan_foto'],
-            'is_active'       => true,
-            'periode_mulai'   => $data['sambutan_periode_mulai'],
-            'periode_selesai' => $data['sambutan_periode_selesai'],
+        // Update selayang_pandang di SiteSetting
+        \App\Models\SiteSetting::updateSettings([
+            'selayang_pandang' => $data['selayang_pandang'],
+            'foto_balai_adat'  => $data['foto_balai_adat'],
         ]);
 
         Notification::make()
-            ->title('Sambutan BPH berhasil disimpan')
+            ->title('Selayang pandang berhasil disimpan')
             ->icon('heroicon-o-check-circle')
             ->success()
             ->send();

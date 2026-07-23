@@ -20,9 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Header keamanan global — aktif untuk semua request web
         $middleware->append(App\Http\Middleware\SecurityHeaders::class);
 
-        // Konfigurasi session security
+        // Konfigurasi session security + locale bahasa
         $middleware->web(append: [
             \Illuminate\Session\Middleware\StartSession::class,
+            \App\Http\Middleware\SetLocale::class,
         ]);
     })
     ->withProviders([

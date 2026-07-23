@@ -39,7 +39,7 @@ class HtmlSanitizer
                 'br,' .
                 'strong,em,u,s,del,ins,mark,sub,sup,' .
                 'a[href|title|target|rel],' .
-                'ul,ol,li,' .
+                'ul[style|class],ol[type|style|class],li[style|class],' .
                 'blockquote,pre,code,' .
                 'hr,' .
                 'img[src|alt|width|height|style],' .
@@ -50,7 +50,7 @@ class HtmlSanitizer
             'CSS.AllowedProperties' =>
                 'text-align,margin,padding,width,height,max-width,' .
                 'border,border-collapse,border-spacing,' .
-                'background-color,color,font-weight,font-style,text-decoration',
+                'background-color,color,font-weight,font-style,text-decoration,list-style-type',
             'HTML.SafeIframe'   => true,
             'URI.SafeIframeRegexp' => '%^https://%',
             'AutoFormat.RemoveEmpty' => false,

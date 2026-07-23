@@ -1,5 +1,5 @@
 // Basic Service Worker for PWA
-const CACHE_NAME = 'lam-bengkalis-pwa-v2';
+const CACHE_NAME = 'lam-bengkalis-pwa-v3';
 const urlsToCache = [
   '/',
   '/manifest.json',

@@ -10,6 +10,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -47,21 +48,47 @@ class StrukturOrganisasiResource extends Resource
                         ->label('Jabatan')
                         ->required()
                         ->maxLength(200)
-                        ->placeholder('contoh: Ketua Umum'),
+                        ->placeholder('contoh: Penyelaras, Anggota'),
 
                     Select::make('kategori')
-                        ->label('Majelis / Dewan')
+                        ->label('Kategori / Majelis')
                         ->required()
                         ->options([
-                            StrukturOrganisasi::KATEGORI_MKA => 'MKA — Majelis Kerapatan Adat',
-                            StrukturOrganisasi::KATEGORI_DPH => 'DPH — Dewan Pengurus Harian',
+                            StrukturOrganisasi::KATEGORI_MKA        => 'MKA — Majelis Kerapatan Adat',
+                            StrukturOrganisasi::KATEGORI_DPH        => 'DPH — Dewan Pengurus Harian',
+                            StrukturOrganisasi::KATEGORI_BIDANG     => 'Bidang — Bidang Kerja DPH',
+                            StrukturOrganisasi::KATEGORI_DKA        => 'DKA — Dewan Kehormatan Adat',
+                            StrukturOrganisasi::KATEGORI_PEMBIMBING => 'Pembimbing Utama',
+                            StrukturOrganisasi::KATEGORI_PENASEHAT  => 'Penasehat',
                         ])
-                        ->native(false),
+                        ->native(false)
+                        ->live(), // reactive agar field nama_bidang muncul kondisional
+
+                    // Nama Bidang — hanya ditampilkan jika kategori = 'Bidang'
+                    TextInput::make('nama_bidang')
+                        ->label('Nama Bidang')
+                        ->maxLength(200)
+                        ->placeholder('contoh: Bidang Organisasi Dan Tata Laksana')
+                        ->helperText('Wajib diisi jika kategori "Bidang". Harus konsisten persis dengan bidang lain agar pengelompokan di situs berfungsi.')
+                        ->required(fn (Get $get) => $get('kategori') === StrukturOrganisasi::KATEGORI_BIDANG)
+                        ->visible(fn (Get $get) => $get('kategori') === StrukturOrganisasi::KATEGORI_BIDANG),
+
+                    // Tingkat Jabatan — menentukan posisi anggota di tampilan publik
+                    Select::make('tingkat_jabatan')
+                        ->label('Tingkat Jabatan')
+                        ->required()
+                        ->options([
+                            StrukturOrganisasi::TINGKAT_PIMPINAN => 'Pimpinan (Penyelaras / Ketua)',
+                            StrukturOrganisasi::TINGKAT_ANGGOTA  => 'Anggota Biasa',
+                        ])
+                        ->default(StrukturOrganisasi::TINGKAT_ANGGOTA)
+                        ->native(false)
+                        ->helperText('Pimpinan selalu tampil langsung di kartu publik. Anggota Biasa tersembunyi dan hanya muncul saat pengunjung klik "Lihat Anggota Lainnya".'),
 
                     TextInput::make('periode')
                         ->label('Periode')
                         ->maxLength(20)
-                        ->placeholder('contoh: 2022–2027'),
+                        ->placeholder('contoh: 2024–2029'),
 
                     TextInput::make('urutan')
                         ->label('Urutan Tampil')
@@ -69,7 +96,7 @@ class StrukturOrganisasiResource extends Resource
                         ->numeric()
                         ->default(0)
                         ->minValue(0)
-                        ->helperText('Semakin kecil angka, semakin atas posisinya.'),
+                        ->helperText('Semakin kecil angka, semakin atas posisinya. Untuk kategori Bidang: pimpinan biasanya urutan 1, anggota mulai urutan 2.'),
 
                     Toggle::make('is_active')
                         ->label('Tampilkan di Situs')
@@ -88,7 +115,7 @@ class StrukturOrganisasiResource extends Resource
                         ->imageEditor()
                         ->imageEditorAspectRatios(['1:1', '3:4'])
                         ->maxSize(1024)
-                        ->helperText('Maks. 1 MB. Rasio 1:1 direkomendasikan.'),
+                        ->helperText('Maks. 1 MB. Rasio 1:1 direkomendasikan. Jika kosong, avatar inisial nama akan ditampilkan.'),
                 ])
                 ->columnSpan(1),
 
@@ -109,7 +136,8 @@ class StrukturOrganisasiResource extends Resource
                     ->disk('public')
                     ->circular()
                     ->width(40)
-                    ->height(40),
+                    ->height(40)
+                    ->defaultImageUrl(fn () => null),
 
                 TextColumn::make('nama')
                     ->label('Nama')
@@ -119,13 +147,35 @@ class StrukturOrganisasiResource extends Resource
                     ->description(fn (StrukturOrganisasi $r) => $r->jabatan),
 
                 TextColumn::make('kategori')
-                    ->label('Majelis/Dewan')
+                    ->label('Kategori')
                     ->badge()
                     ->color(fn (string $state) => match ($state) {
-                        StrukturOrganisasi::KATEGORI_MKA => 'primary',
-                        StrukturOrganisasi::KATEGORI_DPH => 'info',
-                        default                          => 'gray',
+                        StrukturOrganisasi::KATEGORI_MKA        => 'primary',
+                        StrukturOrganisasi::KATEGORI_DPH        => 'info',
+                        StrukturOrganisasi::KATEGORI_BIDANG     => 'success',
+                        StrukturOrganisasi::KATEGORI_DKA        => 'warning',
+                        StrukturOrganisasi::KATEGORI_PEMBIMBING => 'gray',
+                        StrukturOrganisasi::KATEGORI_PENASEHAT  => 'gray',
+                        default                                  => 'gray',
                     })
+                    ->sortable(),
+
+                TextColumn::make('nama_bidang')
+                    ->label('Bidang')
+                    ->searchable()
+                    ->placeholder('—')
+                    ->limit(35)
+                    ->tooltip(fn (TextColumn $column): ?string => strlen($column->getState() ?? '') > 35 ? $column->getState() : null),
+
+                TextColumn::make('tingkat_jabatan')
+                    ->label('Tingkat')
+                    ->badge()
+                    ->color(fn (string $state) => match ($state) {
+                        'pimpinan' => 'warning',
+                        'anggota'  => 'gray',
+                        default    => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state) => ucfirst($state))
                     ->sortable(),
 
                 TextColumn::make('periode')
@@ -140,10 +190,22 @@ class StrukturOrganisasiResource extends Resource
             ->reorderable('urutan')
             ->filters([
                 SelectFilter::make('kategori')
-                    ->label('Majelis / Dewan')
+                    ->label('Kategori')
                     ->options([
-                        StrukturOrganisasi::KATEGORI_MKA => 'MKA',
-                        StrukturOrganisasi::KATEGORI_DPH => 'DPH',
+                        StrukturOrganisasi::KATEGORI_MKA        => 'MKA — Majelis Kerapatan Adat',
+                        StrukturOrganisasi::KATEGORI_DPH        => 'DPH — Dewan Pengurus Harian',
+                        StrukturOrganisasi::KATEGORI_BIDANG     => 'Bidang — Bidang Kerja DPH',
+                        StrukturOrganisasi::KATEGORI_DKA        => 'DKA — Dewan Kehormatan Adat',
+                        StrukturOrganisasi::KATEGORI_PEMBIMBING => 'Pembimbing Utama',
+                        StrukturOrganisasi::KATEGORI_PENASEHAT  => 'Penasehat',
+                    ])
+                    ->native(false),
+
+                SelectFilter::make('tingkat_jabatan')
+                    ->label('Tingkat Jabatan')
+                    ->options([
+                        'pimpinan' => 'Pimpinan',
+                        'anggota'  => 'Anggota Biasa',
                     ])
                     ->native(false),
 

@@ -46,6 +46,16 @@ class PengaturanSitusPage extends Page implements HasForms
     public $hero_berita_path = null;
     public $hero_kontak_path = null;
     public $hero_galeri_path = null;
+    // Hero halaman modul baru
+    public $hero_lam_kecamatan_path = null;
+    public $hero_hukum_adat_path    = null;
+    public $hero_tokoh_adat_path    = null;
+    public $hero_gelar_adat_path    = null;
+    public $hero_agenda_path        = null;
+    public $hero_dokumen_path       = null;
+    public $hero_permohonan_path    = null;
+    public $hero_pendidikan_path    = null;
+    public $hero_cari_path          = null;
 
     public function mount(): void
     {
@@ -83,10 +93,19 @@ class PengaturanSitusPage extends Page implements HasForms
 
         // Hero backgrounds
         $this->heroForm->fill([
-            'hero_profil_path' => $setting->hero_profil_path,
-            'hero_berita_path' => $setting->hero_berita_path,
-            'hero_kontak_path' => $setting->hero_kontak_path,
-            'hero_galeri_path' => $setting->hero_galeri_path,
+            'hero_profil_path'        => $setting->hero_profil_path,
+            'hero_berita_path'        => $setting->hero_berita_path,
+            'hero_kontak_path'        => $setting->hero_kontak_path,
+            'hero_galeri_path'        => $setting->hero_galeri_path,
+            'hero_lam_kecamatan_path' => $setting->hero_lam_kecamatan_path,
+            'hero_hukum_adat_path'    => $setting->hero_hukum_adat_path,
+            'hero_tokoh_adat_path'    => $setting->hero_tokoh_adat_path,
+            'hero_gelar_adat_path'    => $setting->hero_gelar_adat_path,
+            'hero_agenda_path'        => $setting->hero_agenda_path,
+            'hero_dokumen_path'       => $setting->hero_dokumen_path,
+            'hero_permohonan_path'    => $setting->hero_permohonan_path,
+            'hero_pendidikan_path'    => $setting->hero_pendidikan_path,
+            'hero_cari_path'          => $setting->hero_cari_path,
         ]);
     }
 
@@ -206,48 +225,49 @@ class PengaturanSitusPage extends Page implements HasForms
 
     public function heroForm(Form $form): Form
     {
+        $uploadField = fn(string $field, string $label) => FileUpload::make($field)
+            ->label($label)
+            ->image()
+            ->disk('public')
+            ->directory('hero')
+            ->imagePreviewHeight('100')
+            ->maxSize(5120)
+            ->helperText('JPG/PNG/WebP. Min 1600×500px. Maks 5MB.');
+
         return $form->schema([
-            Section::make('Background Hero Per Halaman')
+            Section::make('Hero — Halaman Utama')
                 ->icon('heroicon-o-photo')
-                ->description('Gambar latar untuk kotak header di halaman Profil, Berita, dan Kontak. Ditampilkan dengan gradasi emas di tepi.')
+                ->description('Background header untuk halaman inti website.')
                 ->schema([
-                    FileUpload::make('hero_profil_path')
-                        ->label('Hero — Halaman Profil')
-                        ->image()
-                        ->disk('public')
-                        ->directory('hero')
-                        ->imagePreviewHeight('120')
-                        ->maxSize(5120)
-                        ->helperText('JPG/PNG/WebP. Rekomendasi min 1600×500px. Maks 5 MB.'),
-
-                    FileUpload::make('hero_berita_path')
-                        ->label('Hero — Halaman Berita')
-                        ->image()
-                        ->disk('public')
-                        ->directory('hero')
-                        ->imagePreviewHeight('120')
-                        ->maxSize(5120)
-                        ->helperText('JPG/PNG/WebP. Rekomendasi min 1600×500px. Maks 5 MB.'),
-
-                    FileUpload::make('hero_kontak_path')
-                        ->label('Hero — Halaman Kontak')
-                        ->image()
-                        ->disk('public')
-                        ->directory('hero')
-                        ->imagePreviewHeight('120')
-                        ->maxSize(5120)
-                        ->helperText('JPG/PNG/WebP. Rekomendasi min 1600×500px. Maks 5 MB.'),
-
-                    FileUpload::make('hero_galeri_path')
-                        ->label('Hero — Halaman Galeri')
-                        ->image()
-                        ->disk('public')
-                        ->directory('hero')
-                        ->imagePreviewHeight('120')
-                        ->maxSize(5120)
-                        ->helperText('JPG/PNG/WebP. Rekomendasi min 1600×500px. Maks 5 MB.'),
+                    $uploadField('hero_profil_path', 'Profil / Tentang LAMR'),
+                    $uploadField('hero_berita_path', 'Berita & Pengumuman'),
+                    $uploadField('hero_kontak_path', 'Halaman Kontak'),
+                    $uploadField('hero_galeri_path', 'Galeri Foto'),
                 ])
-                ->columns(1),
+                ->columns(2),
+
+            Section::make('Hero — Halaman Adat & Kelembagaan')
+                ->icon('heroicon-o-building-library')
+                ->description('Background header khusus modul adat. Jika kosong, akan memakai fallback hero halaman Profil.')
+                ->schema([
+                    $uploadField('hero_lam_kecamatan_path', 'LAM Kecamatan'),
+                    $uploadField('hero_hukum_adat_path',    'Hukum Adat'),
+                    $uploadField('hero_tokoh_adat_path',    'Tokoh Adat'),
+                    $uploadField('hero_gelar_adat_path',    'Gelar & Kehormatan Adat'),
+                ])
+                ->columns(2),
+
+            Section::make('Hero — Halaman Informasi & Layanan')
+                ->icon('heroicon-o-clipboard-document-list')
+                ->description('Background header untuk modul informasi publik. Jika kosong, akan memakai fallback hero halaman Profil/Berita.')
+                ->schema([
+                    $uploadField('hero_agenda_path',     'Agenda Kegiatan'),
+                    $uploadField('hero_dokumen_path',    'Dokumen & Peraturan'),
+                    $uploadField('hero_permohonan_path', 'Permohonan Informasi'),
+                    $uploadField('hero_pendidikan_path', 'Pendidikan & Pelatihan'),
+                    $uploadField('hero_cari_path',       'Halaman Pencarian'),
+                ])
+                ->columns(2),
         ])->statePath('');
     }
 
@@ -325,10 +345,19 @@ class PengaturanSitusPage extends Page implements HasForms
     {
         $data = $this->heroForm->getState();
         SiteSetting::updateSettings([
-            'hero_profil_path' => $data['hero_profil_path'],
-            'hero_berita_path' => $data['hero_berita_path'],
-            'hero_kontak_path' => $data['hero_kontak_path'],
-            'hero_galeri_path' => $data['hero_galeri_path'],
+            'hero_profil_path'        => $data['hero_profil_path'],
+            'hero_berita_path'        => $data['hero_berita_path'],
+            'hero_kontak_path'        => $data['hero_kontak_path'],
+            'hero_galeri_path'        => $data['hero_galeri_path'],
+            'hero_lam_kecamatan_path' => $data['hero_lam_kecamatan_path'] ?? null,
+            'hero_hukum_adat_path'    => $data['hero_hukum_adat_path']    ?? null,
+            'hero_tokoh_adat_path'    => $data['hero_tokoh_adat_path']    ?? null,
+            'hero_gelar_adat_path'    => $data['hero_gelar_adat_path']    ?? null,
+            'hero_agenda_path'        => $data['hero_agenda_path']        ?? null,
+            'hero_dokumen_path'       => $data['hero_dokumen_path']       ?? null,
+            'hero_permohonan_path'    => $data['hero_permohonan_path']    ?? null,
+            'hero_pendidikan_path'    => $data['hero_pendidikan_path']    ?? null,
+            'hero_cari_path'          => $data['hero_cari_path']          ?? null,
         ]);
 
         Notification::make()
